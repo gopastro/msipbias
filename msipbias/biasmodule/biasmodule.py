@@ -3,6 +3,9 @@ import sys
 import time
 from scipy import interpolate
 import numpy
+import pkg_resources
+import cStringIO
+from msipbias.utils import MSIPGeneralError
 
 def binspace(number):
     s = bin(number)
@@ -280,13 +283,13 @@ def get_sis_voltage_bytes(Vj, sis=1):
 
 def get_lna_drain_voltage_bytes(Vd, lna=1, stage=1):
     channel = dac1_drain_voltage_channel_selection[(lna, stage)]
-    print channel
+    #print channel
     # below 3 << 14 selects 1,1 for  REG1 and REG0 which are  in bits 14 & 15
     dacnumber = (((channel & 0xff) << 16) & 0xff0000) + \
                  (((3 << 14) & 0xffff) + (set_lna_drain_voltage_word(Vd) & 0x3fff))
     dacnumber = clearBit(dacnumber, 22)
     #dacnumber = dacnumber << 3  # Test to see if 26bytes is correct rather than 29
-    print dacnumber
+    #print dacnumber
     byte2 = (dacnumber & 0xFF0000) >> 16
     byte1 = (dacnumber & 0x00FF00) >> 8
     byte0 = (dacnumber & 0x0000FF)
@@ -294,12 +297,12 @@ def get_lna_drain_voltage_bytes(Vd, lna=1, stage=1):
 
 def get_lna_drain_current_bytes(Id, lna=1, stage=1):
     channel = dac1_drain_current_channel_selection[(lna, stage)]
-    print channel
+    #print channel
     # below 3 << 14 selects 1,1 for  REG1 and REG0 which are  in bits 14 & 15
     dacnumber = (((channel & 0xff) << 16) & 0xff0000) + \
                  (((3 << 14) & 0xffff) + (set_lna_drain_current_word(Id) & 0x3fff))
     dacnumber = clearBit(dacnumber, 22)
-    print dacnumber
+    #print dacnumber
     byte2 = (dacnumber & 0xFF0000) >> 16
     byte1 = (dacnumber & 0x00FF00) >> 8
     byte0 = (dacnumber & 0x0000FF)
@@ -340,14 +343,33 @@ def decode_adc_bytes(bytes):
     """
     return ((bytes[0] & 0x03) << 14) + (bytes[1] << 6) + ((bytes[2] & 0xfc) >> 2)
 
+def decode_adc_bytes2(bytes):
+    """
+    Decodes the three bytes associated with an ADC data read
+    operation.
+    First byte has lowest 1 bits that are readable
+    Second byte has all 8 bits
+    Third byte has highest 7 bits
+    """
+    return ((bytes[0] & 0x01) << 15) + (bytes[1] << 7) + ((bytes[2] & 0xfc) >> 1)
+
 def is_adc_ready(byte):
     return bool((byte & 0x04) >> 2)
 
 def is_dac1_ready(byte):
     return bool((byte & 0x02)>> 1)
 
-class BiasModule(object):
+class CheetahDevice(object):
     def __init__(self):
+        pass
+
+class BiasModule(object):
+    def __init__(self, debug=False, gui_logger=None):
+        self.debug = debug
+        self.gui_logger = gui_logger
+        self.gui_logger_pause = False
+        self.error_code = ''
+        self.device_info = []
         self.find_devices()
         self.open_first_cheetah()
         self.configure_cheetah()
@@ -365,9 +387,18 @@ class BiasModule(object):
                            (1, 1): 'Closed',
                            (1, 2): 'Closed'
                            }
+
+    def bm_print(self, text):
+        if self.debug:
+            print text
+        if self.gui_logger is not None:
+            if not self.gui_logger_pause:
+                self.gui_logger(text)
         
     def load_curve10_data(self, data_file='Curve10.txt'):
-        data = numpy.loadtxt('Curve10.txt', skiprows=1)
+        dstr = pkg_resources.resource_string(__name__, data_file)
+        sio = cStringIO.StringIO(dstr)
+        data = numpy.loadtxt(sio, skiprows=1)
         v, T = data[:, 1], data[:, 0]
         return interpolate.splrep(numpy.flipud(v), numpy.flipud(T), s=0)
     
@@ -376,58 +407,69 @@ class BiasModule(object):
         (self.numdevices, self.ports, self.unique_ids) = ch_find_devices_ext(16, 16)
 
         if self.numdevices > 0:
-            print "%d device(s) found:" % self.numdevices
+            self.bm_print("%d device(s) found:" % self.numdevices)
 
             # Print the information on each device
             for i in range(self.numdevices):
+                dev = CheetahDevice()
                 port      = self.ports[i]
+                dev.port = port
                 unique_id = self.unique_ids[i]
-
+                dev.unique_id = unique_id
+                
                 # Determine if the device is in-use
                 inuse = "(avail)"
                 if (port & CH_PORT_NOT_FREE):
                     inuse = "(in-use)"
                     port  = port & ~CH_PORT_NOT_FREE
-                
+                dev.inuse = inuse
+                dev.serial_number = "%04d-%06d" % (unique_id / 1000000, unique_id % 1000000)
                 # Display device port number, in-use status, and serial number
-                print "    port = %d   %s  (%04d-%06d)" % \
-                    (port, inuse, unique_id / 1000000, unique_id % 1000000)
+                self.bm_print("    port = %d   %s  (%04d-%06d)" % \
+                    (port, inuse, unique_id / 1000000, unique_id % 1000000))
+                self.device_info.append(dev)
             self.port = self.ports[0] # pick the first one
         else:
-            print "No devices found."
+            self.bm_print("No devices found.")
+            raise MSIPGeneralError("CheetahUSB", "No Cheetah USB devices found")
 
     def open_first_cheetah(self):
         # Open the device
-        self.handle = ch_open(self.port)
-        if (self.handle <= 0):
-            print "Unable to open Cheetah device on port %d" % self.port
-            print "Error code = %d (%s)" % (self.handle, ch_status_string(self.handle))
-            sys.exit(1)
-            
-        print "Opened Cheetah device on port %d" % self.port
+        try:
+            self.handle = ch_open(self.port)
+            if (self.handle <= 0):
+                self.bm_print("Unable to open Cheetah device on port %d" % self.port)
+                self.bm_print("Error code = %d (%s)" % (self.handle, ch_status_string(self.handle)))
+                self.error_code = "Error code = %d (%s)" % (self.handle, ch_status_string(self.handle))
+                raise MSIPGeneralError("CheetahUSB", "Unable to open Cheetah Device on port %d.\n Error code = %d (%s)" % (self.port, self.handle, ch_status_string(self.handle)))
 
-        ch_host_ifce_speed_string = ""
+            self.bm_print("Opened Cheetah device on port %d" % self.port)
 
-        if (ch_host_ifce_speed(self.handle)):
-            ch_host_ifce_speed_string = "high speed"
-        else:
-            ch_host_ifce_speed_string = "full speed"
+            ch_host_ifce_speed_string = ""
 
-        print "Host interface is %s" % ch_host_ifce_speed_string
-        sys.stdout.flush()
+            if (ch_host_ifce_speed(self.handle)):
+                ch_host_ifce_speed_string = "high speed"
+            else:
+                ch_host_ifce_speed_string = "full speed"
+
+            self.bm_print("Host interface is %s" % ch_host_ifce_speed_string)
+            self.interface = ch_host_ifce_speed_string
+            sys.stdout.flush()
+        except:
+            raise MSIPGeneralError("CheetahUSB", "Error opening Cheetah USB device")
         
     def configure_cheetah(self):
         # Ensure that the SPI subsystem is configured
         ch_spi_configure(self.handle, CH_SPI_POL_FALLING_RISING,
                          CH_SPI_PHASE_SETUP_SAMPLE,
                          CH_SPI_BITORDER_MSB, 0x0)
-        print "SPI configuration set, clock idle high, LSB shift, SS[2:0] active low" 
+        self.bm_print("SPI configuration set, clock idle high, LSB shift, SS[2:0] active low" )
         sys.stdout.flush()
 
         bitrate = 10000
         # Set the bitrate
         bitrate = ch_spi_bitrate(self.handle, bitrate)
-        print "Bitrate set to %d kHz" % bitrate
+        self.bm_print("Bitrate set to %d kHz" % bitrate)
         sys.stdout.flush()
 
     def test_delay(self, cycles):
@@ -491,7 +533,7 @@ class BiasModule(object):
         #time.sleep(0.1)
         #ch_spi_queue_ss(self.handle, 0)
         ch_spi_batch_shift(self.handle, 0)
-        print "Sent %s " % data_out
+        self.bm_print("Sent %s " % data_out)
         sys.stdout.flush()
         # clear the state of the bus
         ch_spi_queue_clear(self.handle)
@@ -520,7 +562,7 @@ class BiasModule(object):
         ch_spi_async_submit(self.handle)
         # Collect batch the last batch.
         (ret, data_in) = ch_spi_async_collect(self.handle, 0)
-        print "Sent %s " % data_out
+        self.bm_print("Sent %s " % data_out)
         sys.stdout.flush()
         return ret, data_in
         
@@ -538,7 +580,7 @@ class BiasModule(object):
         for i, byte in enumerate(bytes):
             ch_spi_queue_byte(self.handle, 1, byte)
         dly = ch_spi_queue_delay_cycles(self.handle, wait_cycles)
-        print "Delayed by %d clock cycles" % dly
+        self.bm_print( "Delayed by %d clock cycles" % dly)
         sys.stdout.flush()
         #ns = ch_spi_queue_delay_ns(self.handle, 250000)
         #print "  Queued delay of %d ns" % ns
@@ -546,7 +588,7 @@ class BiasModule(object):
         time.sleep(0.1)
         ch_spi_queue_ss(self.handle, 0)
         data_in = ch_spi_batch_shift(self.handle, num_bytes)
-        print "Sent %s" % data_out
+        self.bm_print( "Sent %s" % data_out)
         return data_in
     
     def set_10MHz_mode(self, polar=0):
@@ -568,11 +610,11 @@ class BiasModule(object):
         ch_spi_queue_byte(self.handle, 1, 0x00)
         ch_spi_queue_delay_cycles(self.handle, 8)
         #ch_spi_queue_ss(self.handle, 0)
-        print "Sent cmd %s" % (cmd << 3)
+        self.bm_print( "Sent cmd %s" % (cmd << 3))
         sys.stdout.flush()
         (count, data_in) = ch_spi_batch_shift(self.handle, 2)
         #if count == 1:
-        print count, data_in
+        #print count, data_in
         sys.stdout.flush()
         return data_in
 
@@ -612,7 +654,7 @@ class BiasModule(object):
         cmd = self.shift_breg_parallel_bytes(cmd_by_polar(BREG_PARALLEL_WRITE, polar),
                                              self.breg)
         self.send_command(cmd, wait_cycles=18, shift=False)
-        print "Operating SIS Mixer in Closed Loop: polar: %d, sis: %d" % (polar, sis)
+        self.bm_print( "Operating SIS Mixer in Closed Loop: polar: %d, sis: %d" % (polar, sis))
         self.sis_ivmode[(polar, sis)] = 'Closed'
 
     def sis_open_loop(self, sis=1, polar=0):
@@ -620,7 +662,7 @@ class BiasModule(object):
         cmd = self.shift_breg_parallel_bytes(cmd_by_polar(BREG_PARALLEL_WRITE, polar),
                                              self.breg)
         self.send_command(cmd, wait_cycles=18, shift=False)
-        print "Operating SIS Mixer in Open Loop: polar: %d, sis: %d" % (polar, sis)
+        self.bm_print( "Operating SIS Mixer in Open Loop: polar: %d, sis: %d" % (polar, sis))
         self.sis_ivmode[(polar, sis)] = 'Open'
         
     def lna_enable(self, lna=1, polar=0):
@@ -628,7 +670,7 @@ class BiasModule(object):
         cmd = self.shift_breg_parallel_bytes(cmd_by_polar(BREG_PARALLEL_WRITE, polar),
                                              self.breg)
         self.send_command(cmd, wait_cycles=18, shift=False)
-        print "Enabling LNA Bias: polar: %d, lna: %d" % (polar, lna)
+        self.bm_print( "Enabling LNA Bias: polar: %d, lna: %d" % (polar, lna))
         self.lna_bias_enabled[(polar, lna)] = True
 
     def lna_disable(self, lna=1, polar=0):
@@ -657,9 +699,9 @@ class BiasModule(object):
         self.send_command(cmd, wait_cycles=18)
 
     def hemt_led_control_on(self, polar=0):
-        print self.breg
+        #print self.breg
         self.breg = breg_hemt_led_on(self.breg)
-        print self.breg
+        #print self.breg
         #cmd = [cmd_by_polar(BREG_PARALLEL_WRITE, polar)]
         #cmd.append(self.breg)
         cmd = self.shift_breg_parallel_bytes(cmd_by_polar(BREG_PARALLEL_WRITE, polar),
@@ -686,16 +728,17 @@ class BiasModule(object):
         ch_spi_queue_ss(self.handle, 0x1)
         #ch_spi_queue_byte(handle, 1, 0xFF)
         ch_spi_queue_byte(self.handle, 1, cmd[0] << 3)
-        ch_spi_queue_byte(self.handle, 1, 0xff)
-        ch_spi_queue_byte(self.handle, 1, 0xff)
+        ch_spi_queue_byte(self.handle, 1, 0x0)
+        ch_spi_queue_byte(self.handle, 1, 0x0)
+        #ch_spi_queue_byte(self.handle, 1, 0xff)
         #ch_spi_queue_byte(self.handle, 1, 0xff)
         #ch_spi_queue_delay_cycles(self.handle, 80)
         ch_spi_queue_ss(self.handle, 0)
         #ch_spi_queue_byte(self.handle, 1, 0x00)
         (count, data_in) = ch_spi_batch_shift(self.handle, 3)
         #if count == 1:
-        print "Sent cmd %s" % (cmd[0] << 3)
-        print count, data_in
+        self.bm_print( "Sent cmd %s" % (cmd[0] << 3))
+        #print count, data_in
         sys.stdout.flush()
         #ch_spi_queue_clear(self.handle)
         #ch_spi_queue_oe(self.handle, 1)
@@ -729,10 +772,25 @@ class BiasModule(object):
             diff = 18 - len(binword)
             binword = binword[:2] + '0'*diff + binword[2:]
         byte0 = int(binword[2:10], 2)
-        print "0x%x" % byte0
+        #print "0x%x" % byte0
         byte1 = int(binword[10:], 2)
-        print "0x%x" % byte1
+        #print "0x%x" % byte1
         return [byte0, byte1]
+
+    def check_adc_ready(self, polar=0):
+        """
+        Keeps checking ADC until it is ready
+        """
+        adc_ready = False
+        ct = 0
+        while not adc_ready:
+            din = self.parallel_read(polar=polar)
+            if is_adc_ready(din[0]):
+                adc_ready = True    
+            ct += 1
+            time.sleep(0.001)
+        self.bm_print( "ADC Ready after %d parallel reads" % ct)
+        return
     
     def get_magnet_voltage(self, magnet=1, polar=0):
         """
@@ -757,8 +815,8 @@ class BiasModule(object):
          #       adc_ready = True
         time.sleep(0.001)
         din = self.adc_data_read(polar=polar)
-        dword = twos_comp(decode_adc_bytes(din), 16)
-        print "DWORD: %s"  % dword
+        dword = twos_comp(decode_adc_bytes2(din), 16)
+        self.bm_print( "DWORD: %s"  % dword)
         return get_magnet_voltage(dword)
     
     def get_magnet_current(self, magnet=1, polar=0):
@@ -784,7 +842,7 @@ class BiasModule(object):
         #         adc_ready = True
         time.sleep(0.001)        
         din = self.adc_data_read(polar=polar)
-        dword = twos_comp(decode_adc_bytes(din), 16)
+        dword = twos_comp(decode_adc_bytes2(din), 16)
         return get_magnet_current(dword)
         
     def _get_temp_sensor_voltage(self, sensor=1, polar=0):
@@ -795,16 +853,17 @@ class BiasModule(object):
         cmd = self.shift_areg_parallel_output_bytes(cmd_by_polar(AREG_PARALLEL_WRITE, polar),
                                                     self.areg)
         self.send_command(cmd, wait_cycles=18, shift=False)
+        self.bm_print( "Sending ADC Convert Strobe")
         self.adc_convert_strobe(polar=polar)
         time.sleep(0.001)
         din = self.adc_data_read(polar=polar)
-        dword = twos_comp(decode_adc_bytes(din), 16)
-        print "DWORD: %s"  % dword
+        dword = twos_comp(decode_adc_bytes2(din), 16)
+        self.bm_print( "DWORD: %s"  % dword)
         return get_temperature_sensor_voltage(dword)
 
     def get_temperature(self, sensor=1, polar=0):
         voltage = self._get_temp_sensor_voltage(sensor=sensor, polar=polar)
-        print "Voltage: %s V" % voltage
+        self.bm_print( "Voltage: %s V" % voltage)
         return float(interpolate.splev(voltage, self.curve10, der=0))
 
     def set_sis_mixer_voltage(self, Vj, sis=1, polar=0):
@@ -827,10 +886,29 @@ class BiasModule(object):
         self.adc_convert_strobe(polar=polar)
         time.sleep(0.001)
         din = self.adc_data_read(polar=polar)
-        dword = twos_comp(decode_adc_bytes(din), 16)
-        print "DWORD: %s"  % dword
+        dword = twos_comp(decode_adc_bytes2(din), 16)
+        self.bm_print( "DWORD: %s"  % dword)
         return get_sis_mixer_voltage(dword)
 
+    def get_sis_voltage_with_checks(self, sis=1, polar=0):
+        """
+        Getting the SIS junction voltage through the ADC
+        """
+        self.areg = AREG['SELECT_SIS%d_V' % sis]
+        cmd = self.shift_areg_parallel_output_bytes(cmd_by_polar(AREG_PARALLEL_WRITE, polar),
+                                                    self.areg)
+        self.send_command(cmd, wait_cycles=18, shift=False)
+        self.check_adc_ready(polar=polar)
+        time.sleep(0.010)
+        self.adc_convert_strobe(polar=polar)
+        #time.sleep(0.001)
+        self.check_adc_ready(polar=polar)
+        time.sleep(0.010)
+        din = self.adc_data_read(polar=polar)
+        dword = twos_comp(decode_adc_bytes2(din), 16)
+        self.bm_print( "DWORD: %s"  % dword)
+        return get_sis_mixer_voltage(dword)
+    
     def get_sis_current(self, sis=1, polar=0):
         """
         Getting the SIS junction current through the ADC
@@ -842,8 +920,8 @@ class BiasModule(object):
         self.adc_convert_strobe(polar=polar)
         time.sleep(0.001)
         din = self.adc_data_read(polar=polar)
-        dword = twos_comp(decode_adc_bytes(din), 16)
-        print "DWORD: %s"  % dword
+        dword = twos_comp(decode_adc_bytes2(din), 16)
+        self.bm_print( "DWORD: %s"  % dword)
         return get_sis_mixer_current(dword)    
         
     def set_lna_drain_voltage(self, Vd, lna=1, stage=1, polar=0):
@@ -881,8 +959,8 @@ class BiasModule(object):
         self.adc_convert_strobe(polar=polar)
         time.sleep(0.001)
         din = self.adc_data_read(polar=polar)
-        dword = twos_comp(decode_adc_bytes(din), 16)
-        print "DWORD: %s"  % dword
+        dword = twos_comp(decode_adc_bytes2(din), 16)
+        self.bm_print( "DWORD: %s"  % dword)
         return get_lna_drain_voltage(dword)
 
     def get_lna_drain_current(self, lna=1, stage=1, polar=0):
@@ -896,8 +974,8 @@ class BiasModule(object):
         self.adc_convert_strobe(polar=polar)
         time.sleep(0.001)
         din = self.adc_data_read(polar=polar)
-        dword = twos_comp(decode_adc_bytes(din), 16)
-        print "DWORD: %s"  % dword
+        dword = twos_comp(decode_adc_bytes2(din), 16)
+        self.bm_print( "DWORD: %s"  % dword)
         return get_lna_drain_current(dword)
 
     def get_lna_gate_voltage(self, lna=1, stage=1, polar=0):
@@ -911,8 +989,8 @@ class BiasModule(object):
         self.adc_convert_strobe(polar=polar)
         time.sleep(0.001)
         din = self.adc_data_read(polar=polar)
-        dword = twos_comp(decode_adc_bytes(din), 16)
-        print "DWORD: %s"  % dword
+        dword = twos_comp(decode_adc_bytes2(din), 16)
+        self.bm_print( "DWORD: %s"  % dword)
         return get_lna_gate_voltage(dword)
         
     def close_cheetah(self):
