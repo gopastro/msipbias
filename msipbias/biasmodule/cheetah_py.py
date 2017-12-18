@@ -47,7 +47,7 @@
 #      cheetah.cs       --  C# .NET source
 #      cheetah_net.dll  --  Compiled .NET binding
 #==========================================================================
-
+import os
 
 #==========================================================================
 # VERSION
@@ -55,9 +55,8 @@
 CH_API_VERSION    = 0x0306   # v3.06
 CH_REQ_SW_VERSION = 0x0306   # v3.06
 
-CHEETAH_PATH = '/data/engineering/lmt/vlbi/MSIP/SPI_Cheetah/cheetah-api-linux-x86_64-v3.08/python/'
+CHEETAH_PATH = os.environ.get('CHEETAH_PATH', '/data/engineering/lmt/vlbi/MSIP/SPI_Cheetah/cheetah-api-linux-x86_64-v3.08/python/')
 
-import os
 import sys
 try:
     import cheetah as api
