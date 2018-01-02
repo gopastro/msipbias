@@ -1,0 +1,5 @@
+module BiasCorba {
+  interface BiasModuleCorba {
+    float getTemperature(in short channel);
+  };
+};
