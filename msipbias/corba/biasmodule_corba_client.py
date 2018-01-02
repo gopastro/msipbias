@@ -2,12 +2,12 @@
 
 import sys
 from omniORB import CORBA
-import BiasModuleCorba, CosNaming
+import BiasCorba, CosNaming
 
 class BiasCorbaClient:
     def __init__(self):
         self.orb = CORBA.ORB_init(sys.argv, CORBA.ORB_ID)
-        self.obj = orb.resolve_initial_references("NameService")
+        self.obj = self.orb.resolve_initial_references("NameService")
         rootContext = obj._narrow(CosNaming.NamingContext)
         if rootContext is None:
             print "Failed to narrow the root naming context"
