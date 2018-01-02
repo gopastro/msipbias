@@ -22,7 +22,7 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
 class BiasModuleServer:
     def __init__(self):
         self.orb = CORBA.ORB_init(sys.argv, CORBA.ORB_ID)
-        self.poa = orb.resolve_initial_references("RootPOA")
+        self.poa = self.orb.resolve_initial_references("RootPOA")
 
         self.bi = Bias_i()
         self.bo = self.bi._this()
