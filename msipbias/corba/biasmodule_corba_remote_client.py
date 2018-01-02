@@ -20,7 +20,7 @@ class BiasCorbaRemoteClient:
         try:
             self.obj = rootContext.resolve(name)
         except CosNaming.NamingContext.NotFound, ex:
-            print "Name not found"
+            print "Name not found: %s" % name
             sys.exit(1)
 
         self.bo = self.obj._narrow(BiasCorba.BiasModuleCorba)
