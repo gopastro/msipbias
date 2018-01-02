@@ -51,16 +51,16 @@ class BiasModuleServer:
         # Bind the Bias object to the test context
         name = [CosNaming.NameComponent("BiasModule", "Object")]
         try:
-            testContext.bind(name, bo)
+            testContext.bind(name, self.bo)
             print "New BiasModule object bound"
         except CosNaming.NamingContext.AlreadyBound:
-            testContext.rebind(name, bo)
+            testContext.rebind(name, self.bo)
             print "BiasModule binding already existed -- rebound"
 
         #Activate the poa
         poaManager = self.poa._get_the_POAManager()
         poaManager.activate()
-        print self.orb.object_to_string(eo)
+        print self.orb.object_to_string(self.bo)
 
         self.orb.run()
 
