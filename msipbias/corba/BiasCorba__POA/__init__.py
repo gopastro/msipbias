@@ -6,7 +6,7 @@ import omniORB
 omniORB.updateModule("msipbias.corba.BiasCorba__POA")
 
 # ** 1. Stub files contributing to this module
-from msipbias.corba import biascorba_idl
+import msipbias.corba.biascorba_idl
 
 # ** 2. Sub-modules
 
