@@ -33,7 +33,7 @@ _0_BiasCorba._tc_BiasModuleCorba = omniORB.tcInternal.createTypeCode(_0_BiasCorb
 omniORB.registerType(BiasModuleCorba._NP_RepositoryId, _0_BiasCorba._d_BiasModuleCorba, _0_BiasCorba._tc_BiasModuleCorba)
 
 # BiasModuleCorba operations and attributes
-BiasModuleCorba._d_getTemperature = ((omniORB.tcInternal.tv_short, ), (omniORB.tcInternal.tv_float, ), None)
+BiasModuleCorba._d_getTemperature = ((omniORB.tcInternal.tv_short, omniORB.tcInternal.tv_boolean), (omniORB.tcInternal.tv_float, ), None)
 
 # BiasModuleCorba object reference
 class _objref_BiasModuleCorba (CORBA.Object):

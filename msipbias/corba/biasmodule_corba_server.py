@@ -9,7 +9,7 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
     def __init__(self):
         self.bm = BiasModule()
     
-    def getTemperature(self, channel):
+    def getTemperature(self, channel, dbwrite):
         if channel not in range(1, 7):
             return 0.0
         if channel <= 3:
@@ -17,7 +17,10 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         else:
             polar = 1
         sensor = ((channel -1) % 3) + 1
-        return self.bm.get_temperature(sensor=sensor, polar=polar)
+        temperature = self.bm.get_temperature(sensor=sensor, polar=polar)
+        if dbwrite:
+            print "Temperature: %s" % temperature
+        return temperature
 
 class BiasModuleServer:
     def __init__(self):
