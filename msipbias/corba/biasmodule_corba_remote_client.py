@@ -28,6 +28,6 @@ class BiasCorbaRemoteClient:
             print "Object reference is not an BiasCorba::BiasModuleCorba"
             sys.exit(1)
 
-    def getTemperature(self, channel):
-        temp = self.bo.getTemperature(channel)
+    def getTemperature(self, channel, dbwrite=False):
+        temp = self.bo.getTemperature(channel, dbwrite)
         return temp
