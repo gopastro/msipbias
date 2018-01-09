@@ -428,7 +428,10 @@ class BiasModule(object):
                 self.bm_print("    port = %d   %s  (%04d-%06d)" % \
                     (port, inuse, unique_id / 1000000, unique_id % 1000000))
                 self.device_info.append(dev)
-            self.port = self.ports[0] # pick the first one
+                uid = "%04d-%06d" % (unique_id / 1000000, unique_id % 1000000)
+                if uid == '1364-087103':
+                    self.port = self.ports[0] # pick the first one
+                    self.bm_print("Choosing device %d as SIS bias control Cheetah device" % i)
         else:
             self.bm_print("No devices found.")
             raise MSIPGeneralError("CheetahUSB", "No Cheetah USB devices found")
