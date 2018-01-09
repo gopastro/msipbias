@@ -168,7 +168,7 @@ class MSIPTemperatureGUI(Gtk.ApplicationWindow):
         self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0.05, True, 0.0, 1.0)
 
     def markup_label(self, widget, text, color='blue'):
-        widget.set_markup("""<span foreground="%s" size="large">%s</span>""" % (color, text))
+        widget.set_markup("""<span foreground="%s" size="xx-large">%s</span>""" % (color, text))
 
     def toggle_temperature_monitor(self, button):
         if self.monitor_loop:
