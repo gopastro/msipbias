@@ -375,6 +375,7 @@ class BiasModule(object):
         self.configure_cheetah()
         self.breg = 0x00
         self.curve10 = self.load_curve10_data()  # DT470 Curve 10
+        self.curve600 = self.load_curve600_data()  # DT670 Curve 600
         # lna_bias_enabled: tuple of (polar, lna_number)
         self.lna_bias_enabled = {(0, 1): False,
                                  (0, 2): False,
@@ -401,6 +402,13 @@ class BiasModule(object):
         data = numpy.loadtxt(sio, skiprows=1)
         v, T = data[:, 1], data[:, 0]
         return interpolate.splrep(numpy.flipud(v), numpy.flipud(T), s=0)
+
+    def load_curve600_data(self, data_file='DT600.txt'):
+        dstr = pkg_resources.resource_string(__name__, data_file)
+        sio = cStringIO.StringIO(dstr)
+        data = numpy.loadtxt(sio, skiprows=1)
+        v, T = data[:, 1], data[:, 0]
+        return interpolate.splrep(numpy.flipud(v), numpy.flipud(T), s=0)    
     
     def find_devices(self):
         # Find all the attached devices
@@ -430,7 +438,7 @@ class BiasModule(object):
                 self.device_info.append(dev)
                 uid = "%04d-%06d" % (unique_id / 1000000, unique_id % 1000000)
                 if uid == '1364-087103':
-                    self.port = self.ports[0] # pick the first one
+                    self.port = self.ports[i] # pick the first one
                     self.bm_print("Choosing device %d as SIS bias control Cheetah device" % i)
         else:
             self.bm_print("No devices found.")
@@ -864,10 +872,17 @@ class BiasModule(object):
         self.bm_print( "DWORD: %s"  % dword)
         return get_temperature_sensor_voltage(dword)
 
-    def get_temperature(self, sensor=1, polar=0):
+    def convert_volt_to_temperature(self, voltage, sensor_type='DT470'):
+        if sensor_type == 'DT470':
+            curve = self.curve10
+        else:
+            curve = self.curve600
+        return float(interpolate.splev(voltage, curve, der=0))
+    
+    def get_temperature(self, sensor=1, polar=0, sensor_type='DT470'):
         voltage = self._get_temp_sensor_voltage(sensor=sensor, polar=polar)
         self.bm_print( "Voltage: %s V" % voltage)
-        return float(interpolate.splev(voltage, self.curve10, der=0))
+        return self.convert_volt_to_temperature(voltage, sensor_type=sensor_type)
 
     def set_sis_mixer_voltage(self, Vj, sis=1, polar=0):
         bytes = get_sis_voltage_bytes(Vj, sis=sis)
