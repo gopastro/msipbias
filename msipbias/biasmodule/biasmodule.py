@@ -388,6 +388,13 @@ class BiasModule(object):
                            (1, 1): 'Closed',
                            (1, 2): 'Closed'
                            }
+        self.temperature_sensor_type = {(0, 1): 'DT670',
+                                        (0, 2): 'DT470',
+                                        (0, 3): 'DT670',
+                                        (1, 1): 'DT670',
+                                        (1, 2): 'DT470',
+                                        (1, 3): 'DT670'
+                                        }
 
     def bm_print(self, text):
         if self.debug:
@@ -872,17 +879,21 @@ class BiasModule(object):
         self.bm_print( "DWORD: %s"  % dword)
         return get_temperature_sensor_voltage(dword)
 
-    def convert_volt_to_temperature(self, voltage, sensor_type='DT470'):
+    def convert_volt_to_temperature(self, sensor, polar, voltage,
+                                    sensor_type=None):
+        if sensor type is None:
+            sensory_type = self.temperature_sensor_type((polar, sensor))
         if sensor_type == 'DT470':
             curve = self.curve10
         else:
             curve = self.curve600
         return float(interpolate.splev(voltage, curve, der=0))
     
-    def get_temperature(self, sensor=1, polar=0, sensor_type='DT470'):
+    def get_temperature(self, sensor=1, polar=0, sensor_type=None):
         voltage = self._get_temp_sensor_voltage(sensor=sensor, polar=polar)
         self.bm_print( "Voltage: %s V" % voltage)
-        return self.convert_volt_to_temperature(voltage, sensor_type=sensor_type)
+        return self.convert_volt_to_temperature(sensor, polar, voltage,
+                                                sensor_type=sensor_type)
 
     def set_sis_mixer_voltage(self, Vj, sis=1, polar=0):
         bytes = get_sis_voltage_bytes(Vj, sis=sis)

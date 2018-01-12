@@ -53,6 +53,11 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         self.open_cheetah()
         self.show_temperatures()
         self.show_all()
+        self.ivsweep_dialog = {}
+        for polarization in (0, 1):
+            self.ivsweep_dialog[polarization] = {}
+            for sis in (1, 2):
+                self.ivsweep_dialog[polarization][sis] = None
 
 
     def add_top_box(self):
@@ -287,14 +292,14 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
 
     def do_sis_ivsweep(self, widget, data):
         polarization, sis = data
-        self.ivsweep_dialog = Gtk.Dialog("IV Sweep Pol %d SIS %d" % (polarization, sis),
-                                         self, 0,
-                                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                          Gtk.STOCK_OK, Gtk.ResponseType.OK),
-                                         transient_for=self, modal=True)
+        self.ivsweep_dialog[polarization][sis] = Gtk.Dialog("IV Sweep Pol %d SIS %d" % (polarization, sis),
+                                                            self, 0,
+                                                            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                                             Gtk.STOCK_OK, Gtk.ResponseType.OK),
+                                                            transient_for=self, modal=True)
                 
-        self.ivsweep_dialog.set_default_size(400, 400)
-        box = self.ivsweep_dialog.get_content_area()
+        self.ivsweep_dialog[polarization][sis].set_default_size(400, 400)
+        box = self.ivsweep_dialog[polarization][sis].get_content_area()
         grid = Gtk.Grid()
         label = Gtk.Label("Sweep Range: ")
         self.sis_mixer_sweep_vmin = Gtk.Entry()
@@ -319,12 +324,12 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         self.canvas.set_size_request(700, 700)
         self.sweep_sw.add_with_viewport(self.canvas)
 
-        self.toolbar = NavigationToolbar(self.canvas, self.ivsweep_dialog)
+        self.toolbar = NavigationToolbar(self.canvas, self.ivsweep_dialog[polarization][sis])
         box.pack_start(self.toolbar, False, True, 0)
         
-        self.ivsweep_dialog.show_all()
-        self.ivsweep_dialog.run()
-        self.ivsweep_dialog.destroy()
+        self.ivsweep_dialog[polarization][sis].show_all()
+        self.ivsweep_dialog[polarization][sis].run()
+        self.ivsweep_dialog[polarization][sis].destroy()
 
     def do_sweep_test(self, widget, data):
         polarization, sis = data
