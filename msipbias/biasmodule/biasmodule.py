@@ -881,7 +881,7 @@ class BiasModule(object):
 
     def convert_volt_to_temperature(self, sensor, polar, voltage,
                                     sensor_type=None):
-        if sensor type is None:
+        if sensor_type is None:
             sensory_type = self.temperature_sensor_type((polar, sensor))
         if sensor_type == 'DT470':
             curve = self.curve10
