@@ -388,6 +388,7 @@ class BiasModule(object):
                            (1, 1): 'Closed',
                            (1, 2): 'Closed'
                            }
+        # (polar, sensor)
         self.temperature_sensor_type = {(0, 1): 'DT670',
                                         (0, 2): 'DT470',
                                         (0, 3): 'DT670',
@@ -882,11 +883,12 @@ class BiasModule(object):
     def convert_volt_to_temperature(self, sensor, polar, voltage,
                                     sensor_type=None):
         if sensor_type is None:
-            sensory_type = self.temperature_sensor_type((polar, sensor))
+            sensor_type = self.temperature_sensor_type.get((polar, sensor))
         if sensor_type == 'DT470':
             curve = self.curve10
         else:
             curve = self.curve600
+        #print "polar: %d; sensor=%d; sensor_type=%s" % (polar, sensor, sensor_type)
         return float(interpolate.splev(voltage, curve, der=0))
     
     def get_temperature(self, sensor=1, polar=0, sensor_type=None):
