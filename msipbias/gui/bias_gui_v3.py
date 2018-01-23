@@ -4,6 +4,8 @@ from gi.repository import Gtk, Gdk, GLib, Gio, Pango
 
 from msipbias.biasmodule import BiasModule
 from msipbias.utils import MSIPGeneralError
+from msipbias.orm.biasdata.biasvalues.models import Temperature, \
+    TemperatureChannel
 from .biastab_gui import BiasGridWindow
 import pkg_resources
 import datetime
@@ -29,7 +31,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
                                            GLib.Variant.new_boolean(False))
         max_action.connect("change-state", self.on_maximize_toggle)
         self.add_action(max_action)
-
+        self.temperature_to_database = True
         # Keep it in sync with the actual state
         self.connect("notify::is-maximized",
                             lambda obj, pspec: max_action.set_state(
@@ -229,6 +231,13 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
                             self.temperature[pol * 3 + temp + 1] = self.bm.get_temperature(sensor=temp+1, polar=pol)
                             self.markup_label(self.temperature_label[pol*3 + temp + 1],
                                           "%.2f K" % (self.temperature[pol*3 + temp + 1]))
+                            if self.temperature_to_database:
+                                # Store to database
+                                tempchannel = TemperatureChannel.objects.get(polarization=pol,
+                                                                             sensor=temp+1)
+                                temperature = Temperature(tempchannel=tempchannel,
+                                                          temperature=self.temperature[pol*3 + temp + 1])
+                                temperature.save()                            
                         self.bm_lock = False
                     else:
                         return
@@ -607,10 +616,20 @@ class Application(Gtk.Application):
         self.monitor_timeout_entry.connect("activate", self.monitor_timeout_entry_activated)
         grid.attach(label, 0, 0, 1, 1)
         grid.attach(self.monitor_timeout_entry, 1, 0, 1, 1)
+        label = Gtk.Label("Store to Database: ")
+        self.temperature_database_btn = Gtk.CheckButton(label="Store in db")
+        self.temperature_database_btn.connect("toggled", self.temperature_database_btn_toggled)
+        self.temperature_database_btn.set_active(self.window.temperature_to_database)
+        grid.attach(label, 0, 1, 1, 1)
+        grid.attach(self.temperature_database_btn, 1, 1, 1, 1)
         box.add(grid)
         prefs_dialog.show_all()
         prefs_dialog.run()
         prefs_dialog.destroy()
+
+    def temperature_database_btn_toggled(self, widget, data=None):
+        self.window.temperature_to_database = widget.get_active()
+        print "temperature databases button toggled: %d" % self.window.temperature_to_database
 
     def monitor_timeout_entry_activated(self, widget, data=None):
         try:
