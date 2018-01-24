@@ -359,16 +359,16 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         self.sweep_sis = sis
         try:
             vmin = float(self.sis_mixer_sweep_vmin.get_text())
-            if vmin < -10.0:
-                vmin = -10.0
+            if vmin < -20.0:
+                vmin = -20.0
         except ValueError:
-            vmin = -10.0
+            vmin = -20.0
         try:
             vmax = float(self.sis_mixer_sweep_vmax.get_text())
-            if vmax > 10.0:
-                vmax = 10.0
+            if vmax > 20.0:
+                vmax = 20.0
         except ValueError:
-            vmax = 10.0
+            vmax = 20.0
         self.bm.gui_logger_pause = True
         self.vj = []
         self.ij = []
@@ -389,7 +389,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         #self.do_sweep_animation(vmin, vmax, 0.1)
         for v in numpy.arange(vmin, vmax, 0.1):
              self.bm.set_sis_mixer_voltage(v, sis=sis, polar=polarization)
-             time.sleep(0.005)
+             time.sleep(0.002)
              self.vj.append(self.bm.get_sis_voltage(sis=sis, polar=polarization))
              self.ij.append(self.bm.get_sis_current(sis=sis, polar=polarization))
              self.ax.plot(self.vj[-1], self.ij[-1], 'o', color='k', markersize=8)
@@ -630,7 +630,7 @@ class Application(Gtk.Application):
     def temperature_database_btn_toggled(self, widget, data=None):
         self.window.temperature_to_database = widget.get_active()
         print "temperature databases button toggled: %d" % self.window.temperature_to_database
-
+        
     def monitor_timeout_entry_activated(self, widget, data=None):
         try:
             self.window.monitor_timeout = float(self.monitor_timeout_entry.get_text())
