@@ -378,8 +378,8 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         time.sleep(0.001)
         self.vj.append(self.bm.get_sis_voltage(sis=self.sweep_sis,
                                                polar=self.sweep_polarization))
-        self.ij.append(self.bm.get_sis_current(sis=self.sweep_sis,
-                                               polar=self.sweep_polarization))        
+        self.ij.append(1000 * self.bm.get_sis_current(sis=self.sweep_sis,
+                                               polar=self.sweep_polarization))        #convert to uA
 
         self.ax.plot(self.vj[0], self.ij[0], 'o', color='k',
                      markersize=8)
