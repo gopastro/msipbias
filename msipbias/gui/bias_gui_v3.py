@@ -391,7 +391,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
              self.bm.set_sis_mixer_voltage(v, sis=sis, polar=polarization)
              time.sleep(0.002)
              self.vj.append(self.bm.get_sis_voltage(sis=sis, polar=polarization))
-             self.ij.append(self.bm.get_sis_current(sis=sis, polar=polarization))
+             self.ij.append(1000*self.bm.get_sis_current(sis=sis, polar=polarization))
              self.ax.plot(self.vj[-1], self.ij[-1], 'o', color='k', markersize=8)
              self.canvas.draw()
         # vj = numpy.array(vj)
