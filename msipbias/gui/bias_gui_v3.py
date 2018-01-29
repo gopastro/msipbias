@@ -20,6 +20,16 @@ import matplotlib.animation as animation
 
 import numpy
 
+class LNABias(object):
+    def __init__(self):
+        self.Vd = {}
+        self.Id = {}
+        self.Vg = {}
+        self.state = False
+        for stage in (1, 2, 3): 
+            self.Vd[stage] = 0.7
+            self.Id[stage] = 3.0
+
 class MSIP1mmGUI(Gtk.ApplicationWindow):
     def __init__(self, *args, **kwargs):
         Gtk.ApplicationWindow.__init__(self, *args, **kwargs)
@@ -36,6 +46,12 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         self.connect("notify::is-maximized",
                             lambda obj, pspec: max_action.set_state(
                                                GLib.Variant.new_boolean(obj.props.is_maximized)))
+
+        self.lnabias = {}
+        for polarization in (0, 1):
+            self.lnabias[polarization] = {}
+            for lna in (1, 2):
+                self.lnabias[polarization][lna] = LNABias()
 
         self.bm_found = False
         self.temperature = {}
@@ -60,8 +76,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
             self.ivsweep_dialog[polarization] = {}
             for sis in (1, 2):
                 self.ivsweep_dialog[polarization][sis] = None
-
-
+                
     def add_top_box(self):
         tbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         label = Gtk.Label()
@@ -109,7 +124,8 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
 
         self.biasgrid = {}
         for polarization in range(2):
-            self.biasgrid[polarization] = BiasGridWindow(polarization=polarization)
+            self.biasgrid[polarization] = BiasGridWindow(polarization=polarization,
+                                                         lnabias=self.lnabias[polarization])
             self.notebook.append_page(self.biasgrid[polarization],
                                       Gtk.Label('Pol %d' % polarization))
         self.setup_biasgrid_signals()
@@ -253,10 +269,44 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
                 self.biasgrid[polarization].sis_ivsweep_button[sis].connect("clicked", self.do_sis_ivsweep, [polarization, sis])
             # LNAs
             for lna in (1, 2):
+                self.biasgrid[polarization].lnastate_switch[lna].connect("notify::active", self.on_lna_switch_activated, [polarization, lna])
                 for stage in (1, 2, 3):
                     self.biasgrid[polarization].lna_set_drain_voltage_entry[lna][stage].connect("activate", self.set_lna_drain_voltage, [polarization, lna, stage])
                     self.biasgrid[polarization].lna_set_drain_current_entry[lna][stage].connect("activate", self.set_lna_drain_current, [polarization, lna, stage])
-                
+
+    def on_lna_switch_activated(self, switch, gparam, data):
+        polarization, lna = data
+        if switch.get_active():
+            state = "on"
+            s = True
+        else:
+            state = "off"
+            s = False
+        self.lnabias[polarization][lna].state = s
+        print "Polarization %d: LNA %d Switch was turned %s" % (polarization, lna, state)
+        if self.lnabias[polarization][lna].state:
+            self.lna_turn_on(polarization, lna)
+        else:
+            self.lna_turn_off(polarization, lna)
+
+    def lna_turn_on(self, polarization, lna):
+        for stage in (1, 2, 3):
+            self.biasgrid[polarization].lna_set_drain_voltage_entry[lna][stage].set_text("%.3f" % self.lnabias[polarization][lna].Vd[stage])
+            self.biasgrid[polarization].lna_set_drain_current_entry[lna][stage].set_text("%.3f" % self.lnabias[polarization][lna].Id[stage])
+            self.update_and_read_lna_voltages(drain_voltage=self.lnabias[polarization][lna].Vd[stage],
+                                              drain_current=self.lnabias[polarization][lna].Id[stage],
+                                              polarization=polarization, lna=lna, stage=stage)
+            time.sleep(0.010)
+
+    def lna_turn_off(self, polarization, lna):
+        for stage in (1, 2, 3):
+            self.biasgrid[polarization].lna_set_drain_voltage_entry[lna][stage].set_text("0.0")
+            self.biasgrid[polarization].lna_set_drain_current_entry[lna][stage].set_text("0.0")
+            self.update_and_read_lna_voltages(drain_voltage=0.0,
+                                              drain_current=0.0,
+                                              polarization=polarization, lna=lna, stage=stage)
+            time.sleep(0.010)
+
     def set_magnet_current(self, widget, data):
         polarization, magnet = data
         try:

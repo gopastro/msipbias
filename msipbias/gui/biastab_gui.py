@@ -3,9 +3,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 class BiasGridWindow(Gtk.Grid):
-    def __init__(self, polarization=0):
+    def __init__(self, polarization, lnabias):
         Gtk.Grid.__init__(self)
         self.polarization = polarization
+        self.lnabias = lnabias
         self.title_label = Gtk.Label('Polarization %d' % self.polarization)
         self.attach(self.title_label, 1, 0, 5, 1)
         magnet_frame = self.add_magnet_frame()
@@ -78,23 +79,29 @@ class BiasGridWindow(Gtk.Grid):
         self.lna_read_drain_current_label = {}
         self.lna_read_gate_voltage_label = {}
         col = 0
+        self.lnastate_switch = {}
         for lna in (1, 2):
             frame = Gtk.Frame()
             frame.set_label('LNA%d' % lna)
             lgrid.attach(frame, col*6, 0, 6, 6)
             grid = Gtk.Grid()
             frame.add(grid)
+            label = Gtk.Label("LNA%d Status:" % lna)
+            grid.attach(label, 0, 0, 3, 1)
+            self.lnastate_switch[lna] = Gtk.Switch()
+            self.lnastate_switch[lna].set_active(self.lnabias[lna].state)
+            grid.attach(self.lnastate_switch[lna], 3, 0, 3, 1)
             self.lna_set_drain_current_entry[lna] = {}
             self.lna_set_drain_voltage_entry[lna] = {}
             self.lna_read_drain_voltage_label[lna] = {}
             self.lna_read_drain_current_label[lna] = {}
             self.lna_read_gate_voltage_label[lna] = {}
             icol = 0
-            irow = 0
+            irow = 1
             for stage in (1, 2, 3):
                 iframe = Gtk.Frame()
                 iframe.set_label('Stage%d' % stage)
-                grid.attach(iframe, 0, stage-1, 1, 1)
+                grid.attach(iframe, 0, stage, 1, 1)
                 igrid = Gtk.Grid()
                 iframe.add(igrid)
                 # row 1
@@ -121,5 +128,3 @@ class BiasGridWindow(Gtk.Grid):
             col += 1
         return lna_frame
 
-
-    
