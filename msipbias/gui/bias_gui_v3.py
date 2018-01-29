@@ -294,11 +294,11 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
             self.biasgrid[polarization].lna_set_drain_voltage_entry[lna][stage].set_text("%.3f" % self.lnabias[polarization][lna].Vd[stage])
             self.biasgrid[polarization].lna_set_drain_current_entry[lna][stage].set_text("%.3f" % self.lnabias[polarization][lna].Id[stage])
             # First set drain current and then voltage
-            self.update_and_read_lna_voltages(drain_current=self.lnabias[polarization][lna].Id[stage],
-                                              polarization=polarization, lna=lna, stage=stage)
-            time.sleep(0.010)
             self.update_and_read_lna_voltages(drain_voltage=self.lnabias[polarization][lna].Vd[stage],
                                               polarization=polarization, lna=lna, stage=stage)            
+            time.sleep(0.010)
+            self.update_and_read_lna_voltages(drain_current=self.lnabias[polarization][lna].Id[stage],
+                                              polarization=polarization, lna=lna, stage=stage)
             time.sleep(0.010)
             self.update_and_read_lna_voltages(drain_voltage=self.lnabias[polarization][lna].Vd[stage],
                                               polarization=polarization, lna=lna, stage=stage)
