@@ -302,19 +302,23 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
             time.sleep(0.010)
             self.update_and_read_lna_voltages(drain_voltage=self.lnabias[polarization][lna].Vd[stage],
                                               polarization=polarization, lna=lna, stage=stage)
+            self.update_and_read_lna_voltages(drain_current=self.lnabias[polarization][lna].Id[stage],
+                                              polarization=polarization, lna=lna, stage=stage)            
             
     def lna_turn_off(self, polarization, lna):
         for stage in (1, 2, 3):
             self.biasgrid[polarization].lna_set_drain_voltage_entry[lna][stage].set_text("0.0")
             self.biasgrid[polarization].lna_set_drain_current_entry[lna][stage].set_text("0.0")
+            self.update_and_read_lna_voltages(drain_voltage=0.0,
+                                              polarization=polarization, lna=lna, stage=stage)            
+            time.sleep(0.010)
             self.update_and_read_lna_voltages(drain_current=0.0,
                                               polarization=polarization, lna=lna, stage=stage)
             time.sleep(0.010)
             self.update_and_read_lna_voltages(drain_voltage=0.0,
+                                              polarization=polarization, lna=lna, stage=stage)
+            self.update_and_read_lna_voltages(drain_current=0.0,
                                               polarization=polarization, lna=lna, stage=stage)            
-            time.sleep(0.010)
-            self.update_and_read_lna_voltages(drain_voltage=0.0,
-                                              polarization=polarization, lna=lna, stage=stage)                        
 
     def set_magnet_current(self, widget, data):
         polarization, magnet = data
