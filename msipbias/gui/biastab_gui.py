@@ -110,11 +110,13 @@ class BiasGridWindow(Gtk.Grid):
                 self.lna_set_drain_voltage_entry[lna][stage] = Gtk.Entry()
                 igrid.attach(self.lna_set_drain_voltage_entry[lna][stage], 1, 0,
                              1, 1)
+                self.lna_set_drain_voltage_entry[lna][stage].set_width_chars(8)
                 label = Gtk.Label('Set Drain Current: ')
                 igrid.attach(label, 2, 0, 1, 1)
                 self.lna_set_drain_current_entry[lna][stage] = Gtk.Entry()
                 igrid.attach(self.lna_set_drain_current_entry[lna][stage], 3, 0,
                              1, 1)
+                self.lna_set_drain_current_entry[lna][stage].set_width_chars(8)
                 # row 2
                 self.lna_read_drain_voltage_label[lna][stage] = Gtk.Label("Vd%d" % stage)
                 igrid.attach(self.lna_read_drain_voltage_label[lna][stage],
