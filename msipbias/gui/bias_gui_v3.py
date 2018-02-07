@@ -261,7 +261,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
     def setup_biasgrid_signals(self):
         for polarization in range(2):
             # Magnets
-            for magnet in (1, 2):
+            for magnet in (2, ):
                 self.biasgrid[polarization].magnet_set_current_entry[magnet].connect("activate", self.set_magnet_current, [polarization, magnet])
             # SIS Mixers
             for sis in (1, 2):
@@ -359,7 +359,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
             read_volts = self.bm.get_sis_voltage(sis=sis, polar=polarization)
             self.biasgrid[polarization].sis_read_voltage_label[sis].set_text("%.3f mV" % read_volts)
             read_current = self.bm.get_sis_current(sis=sis, polar=polarization)
-            self.biasgrid[polarization].sis_read_current_label[sis].set_text("%.3f uA" % read_current)
+            self.biasgrid[polarization].sis_read_current_label[sis].set_text("%.3f mA" % read_current)
             self.bm_lock = False
 
     def do_sis_ivsweep(self, widget, data):

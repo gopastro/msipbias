@@ -25,7 +25,7 @@ class BiasGridWindow(Gtk.Grid):
         self.magnet_set_current_entry = {}
         self.magnet_read_voltage_label = {}
         self.magnet_read_current_label = {}
-        for magnet in (1, 2):
+        for magnet in (2,): # Only magnet 2 connected
             label = Gtk.Label('Magnet %d;  Set Current:  ' % magnet)
             self.magnet_set_current_entry[magnet] = Gtk.Entry()
             col = 0
