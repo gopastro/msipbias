@@ -31,3 +31,6 @@ class BiasCorbaRemoteClient:
     def getTemperature(self, channel, dbwrite=False):
         temp = self.bo.getTemperature(channel, dbwrite)
         return temp
+
+    def getMagnetCurrent(self, magnet, polar):
+        return self.bo.getMagnetCurrent(magnet, polar)
