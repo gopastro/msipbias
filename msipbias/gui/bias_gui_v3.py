@@ -269,6 +269,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
             for sis in (1, 2):
                 self.biasgrid[polarization].sis_set_voltage_entry[sis].connect("activate", self.set_sis_voltage, [polarization, sis])
                 self.biasgrid[polarization].sis_ivsweep_button[sis].connect("clicked", self.do_sis_ivsweep, [polarization, sis])
+                self.read_sis(polarization, sis)
             # LNAs
             for lna in (1, 2):
                 self.biasgrid[polarization].lnastate_switch[lna].connect("notify::active", self.on_lna_switch_activated, [polarization, lna])
@@ -359,16 +360,22 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         self.print1("Requesting pol: %d, SIS: %d to a current of %s mA" % (polarization, sis, widget.get_text()))
         self.update_and_read_sis(sis_voltage, polarization, sis)
 
-    def update_and_read_sis(self, sis_voltage, polarization, sis):
+    def read_sis(self, polarization, sis):
         if self.bm_found and not self.bm_lock:
             self.bm_lock = True
-            self.bm.set_sis_mixer_voltage(sis_voltage, sis=sis, polar=polarization)
             time.sleep(0.005)
             read_volts = self.bm.get_sis_voltage(sis=sis, polar=polarization)
             self.biasgrid[polarization].sis_read_voltage_label[sis].set_text("%.3f mV" % read_volts)
             read_current = self.bm.get_sis_current(sis=sis, polar=polarization)
             self.biasgrid[polarization].sis_read_current_label[sis].set_text("%.3f mA" % read_current)
             self.bm_lock = False
+            
+    def update_and_read_sis(self, sis_voltage, polarization, sis):
+        if self.bm_found and not self.bm_lock:
+            self.bm_lock = True
+            self.bm.set_sis_mixer_voltage(sis_voltage, sis=sis, polar=polarization)
+            self.bm_lock = False
+            self.read_sis(self, polarization, sis)
 
     def do_sis_ivsweep(self, widget, data):
         polarization, sis = data
