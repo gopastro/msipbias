@@ -14,7 +14,7 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         self.bm = BiasModule()
 
     def close_bias_module(self):
-        self.bm.close()
+        self.bm.close_cheetah()
         self.bm = None
         
     def getTemperature(self, channel, dbwrite):
