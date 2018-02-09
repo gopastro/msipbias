@@ -263,6 +263,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
             # Magnets
             for magnet in (2, ):
                 self.biasgrid[polarization].magnet_set_current_entry[magnet].connect("activate", self.set_magnet_current, [polarization, magnet])
+                self.read_magnet(polarization, magnet)
             # SIS Mixers
             for sis in (1, 2):
                 self.biasgrid[polarization].sis_set_voltage_entry[sis].connect("activate", self.set_sis_voltage, [polarization, sis])
@@ -273,7 +274,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
                 for stage in (1, 2, 3):
                     self.biasgrid[polarization].lna_set_drain_voltage_entry[lna][stage].connect("activate", self.set_lna_drain_voltage, [polarization, lna, stage])
                     self.biasgrid[polarization].lna_set_drain_current_entry[lna][stage].connect("activate", self.set_lna_drain_current, [polarization, lna, stage])
-
+                    
     def on_lna_switch_activated(self, switch, gparam, data):
         polarization, lna = data
         if switch.get_active():
@@ -330,17 +331,23 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         self.print1("Requesting pol: %d, magnet: %d to a current of %s mA" % (polarization, magnet, widget.get_text()))
         self.update_and_read_magnet(magnet_current, polarization, magnet)
 
-    def update_and_read_magnet(self, magnet_current, polarization, magnet):
+    def read_magnet(self, polarization, magnet):
         if self.bm_found and not self.bm_lock:
             self.bm_lock = True
-            self.bm.set_magnet_current(magnet_current, magnet=magnet, polar=polarization)
             time.sleep(0.005)
             read_volts = self.bm.get_magnet_voltage(magnet=magnet, polar=polarization)
             self.biasgrid[polarization].magnet_read_voltage_label[magnet].set_text("%.3f V" % read_volts)
             read_current = self.bm.get_magnet_current(magnet=magnet, polar=polarization)
             self.biasgrid[polarization].magnet_read_current_label[magnet].set_text("%.3f mA" % read_current)
             self.bm_lock = False
-
+            
+    def update_and_read_magnet(self, magnet_current, polarization, magnet):
+        if self.bm_found and not self.bm_lock:
+            self.bm_lock = True
+            self.bm.set_magnet_current(magnet_current, magnet=magnet, polar=polarization)
+            self.bm_lock = False
+            self.read_magnet(polarization, magnet)
+            
     def set_sis_voltage(self, widget, data):
         polarization, sis = data
         try:
