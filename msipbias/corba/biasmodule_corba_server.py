@@ -7,9 +7,19 @@ from msipbias.biasmodule import BiasModule
 
 class Bias_i (BiasCorba__POA.BiasModuleCorba):
     def __init__(self):
+        #self.bm = BiasModule()
+        self.bm = None
+
+    def open_bias_module(self):
         self.bm = BiasModule()
-    
+
+    def close_bias_module(self):
+        self.bm.close()
+        self.bm = None
+        
     def getTemperature(self, channel, dbwrite):
+        if self.bm is None:
+            self.open_bias_module()
         if channel not in range(1, 7):
             return 0.0
         if channel <= 3:
@@ -20,6 +30,7 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         temperature = self.bm.get_temperature(sensor=sensor, polar=polar)
         if dbwrite:
             print "Temperature: %s" % temperature
+        self.close_bias_module()
         return temperature
 
 class BiasModuleServer:
