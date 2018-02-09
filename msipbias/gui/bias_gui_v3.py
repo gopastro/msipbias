@@ -70,6 +70,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         #self.bm_switch.set_active(True)
         self.open_cheetah()
         self.show_temperatures()
+        self.setup_biasgrid_signals()        
         self.show_all()
         self.ivsweep_dialog = {}
         for polarization in (0, 1):
@@ -128,7 +129,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
                                                          lnabias=self.lnabias[polarization])
             self.notebook.append_page(self.biasgrid[polarization],
                                       Gtk.Label('Pol %d' % polarization))
-        self.setup_biasgrid_signals()
+        #self.setup_biasgrid_signals()
 
     def add_logging_window(self):
         self.scrolled_window = Gtk.ScrolledWindow()
