@@ -33,6 +33,17 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         self.close_bias_module()
         return temperature
 
+    def getMagnetCurrent(self, magnet, polar):
+        if self.bm is None:
+            self.open_bias_module()
+        if magnet not in (1, 2):
+            magnet = 2
+        if polar not in (0, 1):
+            polar = 0
+        current = self.bm.get_magnet_current(magnet, polar)
+        self.close_bias_module()
+        return current
+
 class BiasModuleServer:
     def __init__(self):
         self.orb = CORBA.ORB_init(sys.argv, CORBA.ORB_ID)

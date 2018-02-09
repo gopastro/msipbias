@@ -1,5 +1,6 @@
 module BiasCorba {
   interface BiasModuleCorba {
     float getTemperature(in short channel, in boolean dbwrite);
+    float getMagnetCurrent(in short magnet, in short polar);
   };
 };
