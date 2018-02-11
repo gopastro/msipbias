@@ -53,4 +53,5 @@ class BiasCorbaRemoteClient:
     def getLNAGateVoltage(self, lna, stage, polar):
         return self.bo.getLNAGateVoltage(lna, stage, polar)
     
-    
+    def setMagnetCurrent(self, Imag, magnet, polar):
+        self.bo.setMagnetCurrent(Imag, magnet, polar)    

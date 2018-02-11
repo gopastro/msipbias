@@ -13,7 +13,8 @@ function_dictionary = {
     'getSISVoltage': 'get_sis_voltage',
     'getLNADrainVoltage': 'get_lna_drain_voltage',
     'getLNADrainCurrent': 'get_lna_drain_current',
-    'getLNAGateVoltage': 'get_lna_gate_voltage',    
+    'getLNAGateVoltage': 'get_lna_gate_voltage',
+    'setMagnetCurrent': 'set_magnet_current',
     }
 
 class Bias_i (BiasCorba__POA.BiasModuleCorba):
@@ -35,6 +36,14 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         qty = fn(*args)
         self.close_bias_module()
         return qty
+
+    def setQuantity(self, name, *args):
+        if self.bm is None:
+            self.open_bias_module()
+        fn = getattr(self.bm, function_dictionary.get(name))
+        fn(*args)
+        self.close_bias_module()
+        #return qty    
     
     def getTemperature(self, channel, dbwrite):
         if channel not in range(1, 7):
@@ -108,6 +117,14 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
             polar = 0
         args = [lna, stage, polar]
         return self.getQuantity('getLNAGateVoltage', *args)
+
+    def setMagnetCurrent(self, Imag, magnet, polar):
+        if magnet not in (1, 2):
+            magnet = 2
+        if polar not in (0, 1):
+            polar = 0
+        args = [Imag, magnet, polar]
+        self.setQuantity('setMagnetCurrent', *args)
     
 class BiasModuleServer:
     def __init__(self):
