@@ -34,3 +34,9 @@ class BiasCorbaRemoteClient:
 
     def getMagnetCurrent(self, magnet, polar):
         return self.bo.getMagnetCurrent(magnet, polar)
+
+    def getSISCurrent(self, sis, polar):
+        return self.bo.getSISCurrent(sis, polar)
+
+    def getSISVoltage(self, sis, polar):
+        return self.bo.getSISVoltage(sis, polar)    

@@ -34,8 +34,6 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         return qty
     
     def getTemperature(self, channel, dbwrite):
-        if self.bm is None:
-            self.open_bias_module()
         if channel not in range(1, 7):
             return 0.0
         if channel <= 3:
@@ -43,22 +41,8 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         else:
             polar = 1
         sensor = ((channel -1) % 3) + 1
-        temperature = self.bm.get_temperature(sensor=sensor, polar=polar)
-        if dbwrite:
-            print "Temperature: %s" % temperature
-        self.close_bias_module()
-        return temperature
-
-    # def getMagnetCurrent(self, magnet, polar):
-    #     if self.bm is None:
-    #         self.open_bias_module()
-    #     if magnet not in (1, 2):
-    #         magnet = 2
-    #     if polar not in (0, 1):
-    #         polar = 0
-    #     current = self.bm.get_magnet_current(magnet, polar)
-    #     self.close_bias_module()
-    #     return current
+        args = [sensor, polar]
+        return getQuantity('getTemperature', *args)
 
     def getMagnetCurrent(self, magnet, polar):
         if magnet not in (1, 2):
@@ -68,7 +52,21 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         args = [magnet, polar]
         return self.getQuantity('getMagnetCurrent', *args)
 
-    
+    def getSISVoltage(self, sis, polar):
+        if sis not in (1, 2):
+            sis = 1
+        if polar not in (0, 1):
+            polar = 0
+        args = [sis, polar]
+        return self.getQuantity('getSISVoltage', *args)
+
+    def getSISCurrent(self, sis, polar):
+        if sis not in (1, 2):
+            sis = 1
+        if polar not in (0, 1):
+            polar = 0
+        args = [sis, polar]
+        return self.getQuantity('getSISCurrent', *args)
     
 
 class BiasModuleServer:
