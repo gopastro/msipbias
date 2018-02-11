@@ -182,12 +182,24 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
             self.bm_switch.set_active(False)
             self.bm_found = False
 
+    
     def close_cheetah(self):
         if self.bm_found:
             self.bm.close_cheetah()
             self.bm_found = False
-            self.bm = None
-            
+            self.bm_switch.set_active(False)
+            #self.bm = None
+
+    def reopen_cheetah(self):
+        if not self.bm_found:
+            if self.bm is not None:
+                ret = self.bm.open_first_cheetah()
+                if ret:
+                    self.bm_found = True
+                    self.bm_switch.set_active(True)
+            else:
+                self.print1("Error re-opening Cheetah Unit")
+        
     def on_maximize_toggle(self, action, value):
         action.set_state(value)
         if value.get_boolean():
@@ -221,7 +233,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         self.monitor_loop = not self.monitor_loop
         label = button.get_child()
         if not self.bm_found:
-            self.open_cheetah()
+            self.reopen_cheetah()
             if not self.bm_found:
                 self.print1("Temperature cannot be monitored. Cheetah offline", self.tag_found)
                 self.monitor_loop = False
@@ -274,8 +286,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         for pol in (0, 1):
             for temp in range(3):
                 if self.monitor_loop:
-                    if self.bm is None:
-                        self.open_cheetah()
+                    self.reopen_cheetah()
                     while not self.bm_lock:
                         self.bm_lock = True
                         self.bm.gui_logger_pause = True
@@ -370,8 +381,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         self.update_and_read_magnet(magnet_current, polarization, magnet)
 
     def read_magnet(self, polarization, magnet):
-        if self.bm is None:
-            self.open_cheetah()
+        self.reopen_cheetah()
         if self.bm_found and not self.bm_lock:
             self.bm_lock = True
             time.sleep(0.005)
@@ -400,8 +410,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         self.update_and_read_sis(sis_voltage, polarization, sis)
 
     def read_sis(self, polarization, sis):
-        if self.bm is None:
-            self.open_cheetah()
+        self.reopen_cheetah()
         if self.bm_found and not self.bm_lock:
             self.bm_lock = True
             time.sleep(0.005)
