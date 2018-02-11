@@ -5,5 +5,8 @@ module BiasCorba {
     float getMagnetVoltage(in short magnet, in short polar);
     float getSISVoltage(in short sis, in short polar);
     float getSISCurrent(in short sis, in short polar);
+    float getLNADrainVoltage(in short lna, in short stage, in short polar);
+    float getLNADrainCurrent(in short lna, in short stage, in short polar);
+    float getLNAGateVoltage(in short lna, in short stage, in short polar);
   };
 };

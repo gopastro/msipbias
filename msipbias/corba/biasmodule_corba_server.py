@@ -11,6 +11,9 @@ function_dictionary = {
     'getMagnetVoltage': 'get_magnet_voltage',
     'getSISCurrent': 'get_sis_current',
     'getSISVoltage': 'get_sis_voltage',
+    'getLNADrainVoltage': 'get_lna_drain_voltage',
+    'getLNADrainCurrent': 'get_lna_drain_current',
+    'getLNAGateVoltage': 'get_lna_gate_voltage',    
     }
 
 class Bias_i (BiasCorba__POA.BiasModuleCorba):
@@ -76,7 +79,36 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         args = [sis, polar]
         return self.getQuantity('getSISCurrent', *args)
     
+    def getLNADrainVoltage(self, lna, stage, polar):
+        if lna not in (1, 2):
+            lna = 1
+        if stage not in (1, 2, 3):
+            stage = 1
+        if polar not in (0, 1):
+            polar = 0
+        args = [lna, stage, polar]
+        return self.getQuantity('getLNADrainVoltage', *args)
 
+    def getLNADrainCurrent(self, lna, stage, polar):
+        if lna not in (1, 2):
+            lna = 1
+        if stage not in (1, 2, 3):
+            stage = 1
+        if polar not in (0, 1):
+            polar = 0
+        args = [lna, stage, polar]
+        return self.getQuantity('getLNADrainCurrent', *args)
+
+    def getLNAGateVoltage(self, lna, stage, polar):
+        if lna not in (1, 2):
+            lna = 1
+        if stage not in (1, 2, 3):
+            stage = 1
+        if polar not in (0, 1):
+            polar = 0
+        args = [lna, stage, polar]
+        return self.getQuantity('getLNAGateVoltage', *args)
+    
 class BiasModuleServer:
     def __init__(self):
         self.orb = CORBA.ORB_init(sys.argv, CORBA.ORB_ID)

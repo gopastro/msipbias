@@ -43,3 +43,14 @@ class BiasCorbaRemoteClient:
 
     def getSISVoltage(self, sis, polar):
         return self.bo.getSISVoltage(sis, polar)    
+
+    def getLNADrainVoltage(self, lna, stage, polar):
+        return self.bo.getLNADrainVoltage(lna, stage, polar)
+
+    def getLNADrainCurrent(self, lna, stage, polar):
+        return self.bo.getLNADrainCurrent(lna, stage, polar)
+
+    def getLNAGateVoltage(self, lna, stage, polar):
+        return self.bo.getLNAGateVoltage(lna, stage, polar)
+    
+    
