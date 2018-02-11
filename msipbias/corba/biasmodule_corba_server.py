@@ -42,7 +42,7 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
             polar = 1
         sensor = ((channel -1) % 3) + 1
         args = [sensor, polar]
-        return getQuantity('getTemperature', *args)
+        return self.getQuantity('getTemperature', *args)
 
     def getMagnetCurrent(self, magnet, polar):
         if magnet not in (1, 2):
