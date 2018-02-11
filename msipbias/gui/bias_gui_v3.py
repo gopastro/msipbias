@@ -275,7 +275,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
             for temp in range(3):
                 if self.monitor_loop:
                     if self.bm is None:
-                        self.open_cheetah():
+                        self.open_cheetah()
                     while not self.bm_lock:
                         self.bm_lock = True
                         self.temperature[pol * 3 + temp + 1] = self.bm.get_temperature(sensor=temp+1, polar=pol)
