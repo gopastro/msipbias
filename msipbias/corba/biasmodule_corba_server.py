@@ -52,6 +52,14 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         args = [magnet, polar]
         return self.getQuantity('getMagnetCurrent', *args)
 
+    def getMagnetVoltage(self, magnet, polar):
+        if magnet not in (1, 2):
+            magnet = 2
+        if polar not in (0, 1):
+            polar = 0
+        args = [magnet, polar]
+        return self.getQuantity('getMagnetVoltage', *args)
+    
     def getSISVoltage(self, sis, polar):
         if sis not in (1, 2):
             sis = 1
