@@ -9,5 +9,8 @@ module BiasCorba {
     float getLNADrainCurrent(in short lna, in short stage, in short polar);
     float getLNAGateVoltage(in short lna, in short stage, in short polar);
     void setMagnetCurrent(in float current, in short magnet, in short polar);
+    void setSISVoltage(in float voltage, in short sis, in short polar);
+    void setLNADrainVoltage(in float voltage, in short lna, in short stage, in short polar);
+    void setLNADrainCurrent(in float current, in short lna, in short stage, in short polar);    
   };
 };

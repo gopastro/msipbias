@@ -55,3 +55,13 @@ class BiasCorbaRemoteClient:
     
     def setMagnetCurrent(self, Imag, magnet, polar):
         self.bo.setMagnetCurrent(Imag, magnet, polar)    
+
+    def setSISVoltage(self, voltage, sis, polar):
+        return self.bo.setSISVoltage(voltage, sis, polar)
+
+    def setLNADrainVoltage(self, voltage, lna, stage, polar):
+        return self.bo.setLNADrainVoltage(voltage, lna, stage, polar)
+
+    def setLNADrainCurrent(self, current, lna, stage, polar):
+        return self.bo.setLNADrainCurrent(current, lna, stage, polar)
+

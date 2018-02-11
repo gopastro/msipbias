@@ -15,6 +15,9 @@ function_dictionary = {
     'getLNADrainCurrent': 'get_lna_drain_current',
     'getLNAGateVoltage': 'get_lna_gate_voltage',
     'setMagnetCurrent': 'set_magnet_current',
+    'setSISVoltage': 'set_sis_mixer_voltage',
+    'setLNADrainVoltage': 'set_lna_drain_voltage',
+    'setLNADrainCurrent': 'set_lna_drain_current',    
     }
 
 class Bias_i (BiasCorba__POA.BiasModuleCorba):
@@ -125,7 +128,36 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
             polar = 0
         args = [Imag, magnet, polar]
         self.setQuantity('setMagnetCurrent', *args)
-    
+
+    def setSISVoltage(self, voltage, sis, polar):
+        if sis not in (1, 2):
+            sis = 1
+        if polar not in (0, 1):
+            polar = 0
+        args = [voltage, sis, polar]
+        self.setQuantity('setSISVoltage', *args)
+
+    def setLNADrainVoltage(self, voltage, lna, stage, polar):
+        if lna not in (1, 2):
+            lna = 1
+        if stage not in (1, 2, 3):
+            stage = 1
+        if polar not in (0, 1):
+            polar = 0
+        args = [voltage, lna, stage, polar]        
+        self.setQuantity('setLNADrainVoltage', *args)
+
+    def setLNADrainCurrent(self, current, lna, stage, polar):
+        if lna not in (1, 2):
+            lna = 1
+        if stage not in (1, 2, 3):
+            stage = 1
+        if polar not in (0, 1):
+            polar = 0
+        args = [current, lna, stage, polar]        
+        self.setQuantity('setLNADrainCurrent', *args)
+        
+        
 class BiasModuleServer:
     def __init__(self):
         self.orb = CORBA.ORB_init(sys.argv, CORBA.ORB_ID)
