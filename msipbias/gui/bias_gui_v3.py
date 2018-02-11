@@ -243,10 +243,10 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
     def run_temperature_loop(self):
         while self.monitor_loop:
             #if self.bm_found:
-            self.bm.gui_logger_pause = True
+            #self.bm.gui_logger_pause = True
             self.show_temperatures()
             time.sleep(self.monitor_timeout)
-        self.bm.gui_logger_pause = False
+        #self.bm.gui_logger_pause = False
         
     # def show_temperatures(self):
     #     if self.bm_found:
@@ -278,6 +278,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
                         self.open_cheetah()
                     while not self.bm_lock:
                         self.bm_lock = True
+                        self.bm.gui_logger_pause = True
                         self.temperature[pol * 3 + temp + 1] = self.bm.get_temperature(sensor=temp+1, polar=pol)
                         self.markup_label(self.temperature_label[pol*3 + temp + 1],
                                       "%.2f K" % (self.temperature[pol*3 + temp + 1]))
@@ -289,6 +290,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
                                                       temperature=self.temperature[pol*3 + temp + 1])
                             temperature.save()                            
                     self.bm_lock = False
+                    self.bm.gui_logger_pause = False
                     self.close_cheetah()
                 else:
                     return
