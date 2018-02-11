@@ -5,6 +5,14 @@ from omniORB import CORBA, PortableServer
 import CosNaming, BiasCorba, BiasCorba__POA
 from msipbias.biasmodule import BiasModule
 
+function_dictionary = {
+    'getTemperature': 'get_temperature',
+    'getMagnetCurrent': 'get_magnet_current',
+    'getMagnetVoltage': 'get_magnet_voltage',
+    'getSISCurrent': 'get_sis_current',
+    'getSISVoltage': 'get_sis_voltage',
+    }
+
 class Bias_i (BiasCorba__POA.BiasModuleCorba):
     def __init__(self):
         #self.bm = BiasModule()
@@ -16,7 +24,15 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
     def close_bias_module(self):
         self.bm.close_cheetah()
         self.bm = None
-        
+
+    def getQuantity(self, name, *args):
+        if self.bm is None:
+            self.open_bias_module()
+        fn = getattr(self.bm, function_dictionary.get(name))
+        qty = fn(*args)
+        self.close_bias_module()
+        return qty
+    
     def getTemperature(self, channel, dbwrite):
         if self.bm is None:
             self.open_bias_module()
@@ -33,16 +49,27 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         self.close_bias_module()
         return temperature
 
+    # def getMagnetCurrent(self, magnet, polar):
+    #     if self.bm is None:
+    #         self.open_bias_module()
+    #     if magnet not in (1, 2):
+    #         magnet = 2
+    #     if polar not in (0, 1):
+    #         polar = 0
+    #     current = self.bm.get_magnet_current(magnet, polar)
+    #     self.close_bias_module()
+    #     return current
+
     def getMagnetCurrent(self, magnet, polar):
-        if self.bm is None:
-            self.open_bias_module()
         if magnet not in (1, 2):
             magnet = 2
         if polar not in (0, 1):
             polar = 0
-        current = self.bm.get_magnet_current(magnet, polar)
-        self.close_bias_module()
-        return current
+        args = [magnet, polar]
+        return self.getQuantity('getMagnetCurrent', *args)
+
+    
+    
 
 class BiasModuleServer:
     def __init__(self):
