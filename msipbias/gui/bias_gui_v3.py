@@ -181,6 +181,12 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
             self.print1("Error opening Cheetah Unit", tag=self.tag_found)
             self.bm_switch.set_active(False)
             self.bm_found = False
+
+    def close_cheetah(self):
+        if self.bm_found:
+            self.bm.close_cheetah()
+            self.bm_found = False
+            self.bm = None
             
     def on_maximize_toggle(self, action, value):
         action.set_state(value)
@@ -215,8 +221,12 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         self.monitor_loop = not self.monitor_loop
         label = button.get_child()
         if not self.bm_found:
-            self.print1("Temperature cannot be monitored. Cheetah offline", self.tag_found)
-            self.monitor_loop = False
+            self.open_cheetah()
+            if not self.bm_found:
+                self.print1("Temperature cannot be monitored. Cheetah offline", self.tag_found)
+                self.monitor_loop = False
+            else:
+                self.close_cheetah()
         if self.monitor_loop:
             txt = "Stop Temperature Monitoring"
         else:
@@ -232,33 +242,57 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
 
     def run_temperature_loop(self):
         while self.monitor_loop:
-            if self.bm_found:
-                self.bm.gui_logger_pause = True
+            #if self.bm_found:
+            self.bm.gui_logger_pause = True
             self.show_temperatures()
             time.sleep(self.monitor_timeout)
         self.bm.gui_logger_pause = False
         
-    def show_temperatures(self):
-        if self.bm_found:
-            for pol in (0, 1):
-                for temp in range(3):
-                    if self.monitor_loop:
-                        while not self.bm_lock:
-                            self.bm_lock = True
-                            self.temperature[pol * 3 + temp + 1] = self.bm.get_temperature(sensor=temp+1, polar=pol)
-                            self.markup_label(self.temperature_label[pol*3 + temp + 1],
-                                          "%.2f K" % (self.temperature[pol*3 + temp + 1]))
-                            if self.temperature_to_database:
-                                # Store to database
-                                tempchannel = TemperatureChannel.objects.get(polarization=pol,
-                                                                             sensor=temp+1)
-                                temperature = Temperature(tempchannel=tempchannel,
-                                                          temperature=self.temperature[pol*3 + temp + 1])
-                                temperature.save()                            
-                        self.bm_lock = False
-                    else:
-                        return
+    # def show_temperatures(self):
+    #     if self.bm_found:
+    #         for pol in (0, 1):
+    #             for temp in range(3):
+    #                 if self.monitor_loop:
+    #                     while not self.bm_lock:
+    #                         self.bm_lock = True
+    #                         self.temperature[pol * 3 + temp + 1] = self.bm.get_temperature(sensor=temp+1, polar=pol)
+    #                         self.markup_label(self.temperature_label[pol*3 + temp + 1],
+    #                                       "%.2f K" % (self.temperature[pol*3 + temp + 1]))
+    #                         if self.temperature_to_database:
+    #                             # Store to database
+    #                             tempchannel = TemperatureChannel.objects.get(polarization=pol,
+    #                                                                          sensor=temp+1)
+    #                             temperature = Temperature(tempchannel=tempchannel,
+    #                                                       temperature=self.temperature[pol*3 + temp + 1])
+    #                             temperature.save()                            
+    #                     self.bm_lock = False
+    #                 else:
+    #                     return
 
+    def show_temperatures(self):
+        #if self.bm_found:
+        for pol in (0, 1):
+            for temp in range(3):
+                if self.monitor_loop:
+                    if self.bm is None:
+                        self.open_cheetah():
+                    while not self.bm_lock:
+                        self.bm_lock = True
+                        self.temperature[pol * 3 + temp + 1] = self.bm.get_temperature(sensor=temp+1, polar=pol)
+                        self.markup_label(self.temperature_label[pol*3 + temp + 1],
+                                      "%.2f K" % (self.temperature[pol*3 + temp + 1]))
+                        if self.temperature_to_database:
+                            # Store to database
+                            tempchannel = TemperatureChannel.objects.get(polarization=pol,
+                                                                         sensor=temp+1)
+                            temperature = Temperature(tempchannel=tempchannel,
+                                                      temperature=self.temperature[pol*3 + temp + 1])
+                            temperature.save()                            
+                    self.bm_lock = False
+                    self.close_cheetah()
+                else:
+                    return
+                    
     def setup_biasgrid_signals(self):
         for polarization in range(2):
             # Magnets
@@ -334,6 +368,8 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         self.update_and_read_magnet(magnet_current, polarization, magnet)
 
     def read_magnet(self, polarization, magnet):
+        if self.bm is None:
+            self.open_cheetah()
         if self.bm_found and not self.bm_lock:
             self.bm_lock = True
             time.sleep(0.005)
@@ -342,6 +378,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
             read_current = self.bm.get_magnet_current(magnet=magnet, polar=polarization)
             self.biasgrid[polarization].magnet_read_current_label[magnet].set_text("%.3f mA" % read_current)
             self.bm_lock = False
+            self.close_cheetah()
             
     def update_and_read_magnet(self, magnet_current, polarization, magnet):
         if self.bm_found and not self.bm_lock:
@@ -361,6 +398,8 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         self.update_and_read_sis(sis_voltage, polarization, sis)
 
     def read_sis(self, polarization, sis):
+        if self.bm is None:
+            self.open_cheetah()
         if self.bm_found and not self.bm_lock:
             self.bm_lock = True
             time.sleep(0.005)
@@ -369,6 +408,7 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
             read_current = self.bm.get_sis_current(sis=sis, polar=polarization)
             self.biasgrid[polarization].sis_read_current_label[sis].set_text("%.3f mA" % read_current)
             self.bm_lock = False
+            self.close_cheetah()
             
     def update_and_read_sis(self, sis_voltage, polarization, sis):
         if self.bm_found and not self.bm_lock:
