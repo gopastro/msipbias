@@ -474,6 +474,7 @@ class BiasModule(object):
             self.bm_print("Host interface is %s" % ch_host_ifce_speed_string)
             self.interface = ch_host_ifce_speed_string
             sys.stdout.flush()
+            return True
         except:
             raise MSIPGeneralError("CheetahUSB", "Error opening Cheetah USB device")
         
