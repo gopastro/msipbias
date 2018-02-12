@@ -69,6 +69,8 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
         #self.temperature_label[1].set_label('100 K')
         #self.bm_switch.set_active(True)
         self.open_cheetah()
+        time.sleep(1.0)
+        self.close_cheetah()
         self.show_temperatures()
         self.setup_biasgrid_signals()        
         self.show_all()
