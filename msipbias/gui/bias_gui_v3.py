@@ -166,7 +166,8 @@ class MSIP1mmGUI(Gtk.ApplicationWindow):
     def open_cheetah(self):
         try:
             #self.bm = BiasModule(debug=True, gui_logger=self.print1)
-            self.bm = BiasModule(debug=False, gui_logger=self.print1)
+            #self.bm = BiasModule(debug=False, gui_logger=self.print1)
+            self.bm = BiasModule(debug=False, gui_logger=None)
             self.print1("%d device(s) found: " % (self.bm.numdevices))
             for dev in self.bm.device_info:
                 self.print1("    port = %d  %s (Ser: %s)" % (dev.port, dev.inuse, dev.serial_number))
