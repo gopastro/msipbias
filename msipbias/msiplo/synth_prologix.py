@@ -2,7 +2,7 @@ import socket
 
 class Synthesizer:
     def __init__(self, host='192.168.1.101',
-                 port=1234, synth_address=19):
+                 port=1234, synth_address=20):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((host, port))
         self.synth_address = synth_address
@@ -38,6 +38,10 @@ class Synthesizer:
         self.mult = float(self.ask('FREQ:MULT?'))
         return self.mult
 
+    def set_mult(self, multiplier):
+        """ Set frequency Multiplier"""
+        self.write('FREQ:MULT %d' % multiplier)
+    
     def get_freq(self):
         """Get current CW frequency"""
         return float(self.ask('FREQ:CW?'))

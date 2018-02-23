@@ -24,6 +24,7 @@ class MSIPLOSystem():
         self.synth = Synthesizer(host=prologix_host,
                                  port=prologix_port,
                                  synth_address=synth_address)
+        self.synth.set_mult(6)
         self.default_synth_power = default_synth_power
         self.max_synth_power = max_synth_power
         self.min_synth_power = min_synth_power
