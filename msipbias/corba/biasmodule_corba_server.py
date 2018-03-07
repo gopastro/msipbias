@@ -158,7 +158,7 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         args = [current, lna, stage, polar]        
         self.setQuantity('setLNADrainCurrent', *args)
 
-    def LNA_turn_on(self, polar):
+    def turnONLNA(self, polar):
         """
         Turns on all three stages of LNA on 
         as for a given polarization
@@ -173,7 +173,7 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
                     self.setLNADrainCurrent(3.0, lna, stage, polar=polar)
                     time.sleep(0.05)
 
-    def LNA_turn_off(self, polar):
+    def turnOFFLNA(self, polar):
         """
         Turns on all three stages of LNA on 
         as for a given polarization

@@ -65,9 +65,9 @@ class BiasCorbaRemoteClient:
     def setLNADrainCurrent(self, current, lna, stage, polar):
         return self.bo.setLNADrainCurrent(current, lna, stage, polar)
 
-    def LNA_turn_on(self, polar):
-        return self.bo.LNA_turn_on(polar)
+    def turnONLNA(self, polar):
+        return self.bo.turnONLNA(polar)
 
-    def LNA_turn_off(self, polar):
-        return self.bo.LNA_turn_off(polar)    
+    def turnOFFLNA(self, polar):
+        return self.bo.turnOFFLNA(polar)    
     
