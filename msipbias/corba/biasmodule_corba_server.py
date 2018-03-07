@@ -4,6 +4,7 @@ import sys
 from omniORB import CORBA, PortableServer
 import CosNaming, BiasCorba, BiasCorba__POA
 from msipbias.biasmodule import BiasModule
+import time
 
 function_dictionary = {
     'getTemperature': 'get_temperature',
@@ -156,8 +157,37 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
             polar = 0
         args = [current, lna, stage, polar]        
         self.setQuantity('setLNADrainCurrent', *args)
-        
-        
+
+    def LNA_turn_on(self, polar):
+        """
+        Turns on all three stages of LNA on 
+        as for a given polarization
+        """
+        if polar not in (0, 1):
+            polar = 0
+        for iteration in range(2):
+            for lna in (1, 2):
+                for stage in (1, 2, 3):
+                    self.setLNADrainVoltage(0.7, lna, stage, polar=polar)
+                    time.sleep(0.05)
+                    self.setLNADrainCurrent(3.0, lna, stage, polar=polar)
+                    time.sleep(0.05)
+
+    def LNA_turn_off(self, polar):
+        """
+        Turns on all three stages of LNA on 
+        as for a given polarization
+        """
+        if polar not in (0, 1):
+            polar = 0
+        for iteration in range(2):
+            for lna in (1, 2):
+                for stage in (1, 2, 3):
+                    self.setLNADrainVoltage(0.0, lna, stage, polar=polar)
+                    time.sleep(0.05)
+                    self.setLNADrainCurrent(0.0, lna, stage, polar=polar)
+                    time.sleep(0.05)
+                    
 class BiasModuleServer:
     def __init__(self):
         self.orb = CORBA.ORB_init(sys.argv, CORBA.ORB_ID)

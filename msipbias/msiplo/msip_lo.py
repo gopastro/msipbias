@@ -14,6 +14,7 @@ class MSIPLOSystem():
                  prologix_port=1234, synth_address=19,
                  default_synth_power=13,
                  max_synth_power=16,
+                 start_power_level_voltage=5,
                  min_synth_power=10,
                  numIterations=100,
                  maxLoopIterations=10):
@@ -29,8 +30,11 @@ class MSIPLOSystem():
         self.max_synth_power = max_synth_power
         self.min_synth_power = min_synth_power
         # Open Labjack to read voltages
+        self.start_power_level_voltage = start_power_level_voltage
         self.labjack = U3AnalogIn(debug=self.debug,
                                   numIterations=numIterations)
+        self.labjack.setDAVoltage(0, self.start_power_level_voltage)
+        self.power_level_voltage = self.start_power_level_voltage
         # Open YIG synth
         self.ml = MicroLambda(debug=self.debug)
 
@@ -39,7 +43,15 @@ class MSIPLOSystem():
         IFLevel = volts[0, :].mean()
         loopVoltage = volts[1, :].mean()
         return IFLevel, loopVoltage
-    
+
+    def set_power_level_voltage(self, voltage):
+        if voltage < 0.0 or voltage > 0.0:
+            print "Drain Power level voltage has to be in range of 0 to 5V"
+            return
+        self.power_level_voltage = voltage
+        self.labjack.setDAVoltage(0, self.power_level_voltage)
+        time.sleep(0.010)
+        
     def set_and_lock_frequency(self, flo, synth_power=None):
         """
         Set frequency flo in GHz for 3mm LO system 
