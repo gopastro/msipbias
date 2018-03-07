@@ -75,6 +75,19 @@ class U3AnalogIn():
                 print "Channel: %d, voltage: %.6f +/- %.6f" % (channel, self.latestAinValues[channel, :].mean(), self.latestAinValues[channel, :].std())
         return self.latestAinValues
 
+    def setDAVoltage(self, dacNumber, voltage):
+        if dacNumber not in (0, 1):
+            print "dacNumber should be one of 0, 1"
+            return
+        if voltage < 0.0 or voltage > 5.0:
+            print "voltage should be in range of 0 to 5V"
+            return
+        DAC_VALUE = self.dev.voltageToDACBits(voltage, dacNumber=dacNumber,
+                                       is16Bits=False)
+        self.dev.getFeedback(u3.DAC0_8(DAC_VALUE))
+        if self.debug:
+            print "dacNumber: %d set to %s V" % (dacNumber, voltage)
+            
     def close(self):
         self.dev.close()
     
