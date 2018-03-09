@@ -1073,7 +1073,12 @@ class BiasModule(object):
                 dic['temperature'] = self.get_temperature(sensor=sensor,
                                                           polar=polar)
                 lisdic.append(dic)
+                channel += 1
         return lisdic
+
+    def set_paired_sis_voltages(self, voltage, polar=0):
+        self.set_sis_mixer_voltage(-voltage, sis=1, polar=polar)
+        self.set_sis_mixer_voltage(voltage, sis=2, polar=polar)
                         
     def close_cheetah(self):
         ch_close(self.handle)
