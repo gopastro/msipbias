@@ -1024,7 +1024,56 @@ class BiasModule(object):
         dword = twos_comp(decode_adc_bytes2(din), 16)
         self.bm_print( "DWORD: %s"  % dword)
         return get_lna_gate_voltage(dword)
-        
+
+    def monitor_magnets(self):
+        lisdic = []
+        for polar in (0, 1):
+            dic = {}
+            dic['polar']  = polar
+            dic['magnet_current'] = self.get_magnet_current(magnet=2, polar=polar)
+            lisdic.append(dic)
+        return lisdic
+
+    def monitor_sis(self):
+        lisdic = []
+        for polar in (0, 1):
+            for sis in (1, 2):
+                dic = {}
+                dic['polar'] = polar
+                dic['vj%d' % sis] = self.get_sis_voltage(sis=sis, polar=polar)
+                dic['ij%d' % sis] = self.get_sis_current(sis=sis, polar=polar)
+                lisdic.append(dic)
+                
+    def monitor_lna(self):
+        lisdic = []
+        for polar in (0, 1):
+            for lna in (1, 2):
+                for stage in (1, 2, 3):
+                    dic = {}
+                    dic['polar'] = polar
+                    dic['LNA'] = lna
+                    dic['VD%d' % stage] = self.get_lna_drain_voltage(stage=stage,
+                                                                     lna=lna, polar=polar)
+                    dic['ID%d' % stage] = self.get_lna_drain_current(stage=stage,
+                                                                     lna=lna, polar=polar)
+                    dic['VG%d' % stage] = self.get_lna_gate_voltage(stage=stage,
+                                                                    lna=lna, polar=polar)
+                    lisdic.append(dic)
+        return lisdic
+                        
+
+    def monitor_temperature(self):
+        lisdic = []
+        channel = 1
+        for polar in (0, 1):
+            for sensor in (1, 2, 3):
+                dic = {}
+                dic['channel'] = channel
+                dic['temperature'] = self.get_temperature(sensor=sensor,
+                                                          polar=polar)
+                lisdic.append(dic)
+        return lisdic
+                        
     def close_cheetah(self):
         ch_close(self.handle)
         
