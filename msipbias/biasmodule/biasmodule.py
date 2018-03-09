@@ -1043,7 +1043,8 @@ class BiasModule(object):
                 dic['vj%d' % sis] = self.get_sis_voltage(sis=sis, polar=polar)
                 dic['ij%d' % sis] = self.get_sis_current(sis=sis, polar=polar)
                 lisdic.append(dic)
-                
+        return lisdic
+    
     def monitor_lna(self):
         lisdic = []
         for polar in (0, 1):
