@@ -1079,7 +1079,35 @@ class BiasModule(object):
     def set_paired_sis_voltages(self, voltage, polar=0):
         self.set_sis_mixer_voltage(-voltage, sis=1, polar=polar)
         self.set_sis_mixer_voltage(voltage, sis=2, polar=polar)
-                        
+
+    def set_lna_drain_voltage_current(self, voltage, current, lna=1,
+                                      stage=1, polar=0):
+        """
+        Sets and checks voltage and current within nominal limits
+        """
+        self.set_lna_drain_voltage(voltage, lna=lna, stage=stage, polar=polar)
+        self.set_lna_drain_current(current, lna=lna, stage=stage, polar=polar)
+        viset = False
+        while not viset:
+            vd = self.get_lna_drain_voltage(lna=lna, stage=stage, polar=polar)
+            if abs(vd - voltage) > 0.1:
+                self.set_lna_drain_voltage(voltage, lna=lna, stage=stage, polar=polar)
+                self.set_lna_drain_current(current, lna=lna, stage=stage, polar=polar)
+            id = self.get_lna_drain_current(lna=lna, stage=stage, polar=polar)
+            if abs(id - current) > 0.2:
+                self.set_lna_drain_voltage(voltage, lna=lna, stage=stage, polar=polar)
+                self.set_lna_drain_current(current, lna=lna, stage=stage, polar=polar)
+            vd = self.get_lna_drain_voltage(lna=lna, stage=stage, polar=polar)
+            id = self.get_lna_drain_current(lna=lna, stage=stage, polar=polar)
+            if abs(vd - voltage) < 0.1 and abs(id - current) < 0.2:
+                viset = True
+            time.sleep(0.010)
+        if self.debug:
+            vd = self.get_lna_drain_voltage(lna=lna, stage=stage, polar=polar)
+            id = self.get_lna_drain_current(lna=lna, stage=stage, polar=polar)
+            vg = self.get_lna_gate_voltage(lna=lna, stage=stage, polar=polar)
+            self.bm_print("LNA: %d; stage: %d; polar: %d, Vd: %.3f, Id: %.3f, Vg: %.3f" % (lna, stage, polar, vd, id, vg))
+                          
     def close_cheetah(self):
         ch_close(self.handle)
         
