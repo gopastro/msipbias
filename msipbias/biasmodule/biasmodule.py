@@ -1107,7 +1107,17 @@ class BiasModule(object):
             id = self.get_lna_drain_current(lna=lna, stage=stage, polar=polar)
             vg = self.get_lna_gate_voltage(lna=lna, stage=stage, polar=polar)
             self.bm_print("LNA: %d; stage: %d; polar: %d, Vd: %.3f, Id: %.3f, Vg: %.3f" % (lna, stage, polar, vd, id, vg))
-                          
+
+    def turn_on_LNA(self, polar=0):
+        for lna in (1, 2):
+            for stage in (1, 2, 3):
+                self.set_lna_drain_voltage_current(0.7, 3.0, lna=lna, stage=stage, polar=polar)
+
+    def turn_off_LNA(self, polar=0):
+        for lna in (1, 2):
+            for stage in (1, 2, 3):
+                self.set_lna_drain_voltage_current(0.0, 0.0, lna=lna, stage=stage, polar=polar)
+
     def close_cheetah(self):
         ch_close(self.handle)
         
