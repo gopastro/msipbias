@@ -79,3 +79,7 @@ class Synthesizer:
     def output_on(self):
         "Turn RF output on"""
         self.write("OUTPUT:STATE ON")
+
+    def close(self):
+        self.sock.close()
+        

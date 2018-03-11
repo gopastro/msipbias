@@ -14,7 +14,7 @@ class MSIPLOSystem():
                  prologix_port=1234, synth_address=19,
                  default_synth_power=13,
                  max_synth_power=16,
-                 start_power_level_voltage=5,
+                 start_power_level_voltage=2.5,
                  min_synth_power=10,
                  numIterations=100,
                  maxLoopIterations=10):
@@ -134,3 +134,8 @@ class MSIPLOSystem():
         else:
             return False
 
+    def close(self):
+        self.synth.close()
+        self.ml.close_cheetah()
+        self.labjack.close()
+    
