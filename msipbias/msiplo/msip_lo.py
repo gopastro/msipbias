@@ -45,7 +45,7 @@ class MSIPLOSystem():
         return IFLevel, loopVoltage
 
     def set_power_level_voltage(self, voltage):
-        if voltage < 0.0 or voltage > 0.0:
+        if voltage < 0.0 or voltage > 5.0:
             print "Drain Power level voltage has to be in range of 0 to 5V"
             return
         self.power_level_voltage = voltage
