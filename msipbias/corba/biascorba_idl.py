@@ -45,6 +45,7 @@ BiasModuleCorba._d_setMagnetCurrent = ((omniORB.tcInternal.tv_float, omniORB.tcI
 BiasModuleCorba._d_setSISVoltage = ((omniORB.tcInternal.tv_float, omniORB.tcInternal.tv_short, omniORB.tcInternal.tv_short), (), None)
 BiasModuleCorba._d_setLNADrainVoltage = ((omniORB.tcInternal.tv_float, omniORB.tcInternal.tv_short, omniORB.tcInternal.tv_short, omniORB.tcInternal.tv_short), (), None)
 BiasModuleCorba._d_setLNADrainCurrent = ((omniORB.tcInternal.tv_float, omniORB.tcInternal.tv_short, omniORB.tcInternal.tv_short, omniORB.tcInternal.tv_short), (), None)
+BiasModuleCorba._d_setLNADrainVoltageCurrent = ((omniORB.tcInternal.tv_float, omniORB.tcInternal.tv_float, omniORB.tcInternal.tv_short, omniORB.tcInternal.tv_short, omniORB.tcInternal.tv_short), (), None)
 BiasModuleCorba._d_turnONLNA = ((omniORB.tcInternal.tv_short, ), (), None)
 BiasModuleCorba._d_turnOFFLNA = ((omniORB.tcInternal.tv_short, ), (), None)
 
@@ -91,13 +92,16 @@ class _objref_BiasModuleCorba (CORBA.Object):
     def setLNADrainCurrent(self, *args):
         return _omnipy.invoke(self, "setLNADrainCurrent", _0_BiasCorba.BiasModuleCorba._d_setLNADrainCurrent, args)
 
+    def setLNADrainVoltageCurrent(self, *args):
+        return _omnipy.invoke(self, "setLNADrainVoltageCurrent", _0_BiasCorba.BiasModuleCorba._d_setLNADrainVoltageCurrent, args)
+
     def turnONLNA(self, *args):
         return _omnipy.invoke(self, "turnONLNA", _0_BiasCorba.BiasModuleCorba._d_turnONLNA, args)
 
     def turnOFFLNA(self, *args):
         return _omnipy.invoke(self, "turnOFFLNA", _0_BiasCorba.BiasModuleCorba._d_turnOFFLNA, args)
 
-    __methods__ = ["getTemperature", "getMagnetCurrent", "getMagnetVoltage", "getSISVoltage", "getSISCurrent", "getLNADrainVoltage", "getLNADrainCurrent", "getLNAGateVoltage", "setMagnetCurrent", "setSISVoltage", "setLNADrainVoltage", "setLNADrainCurrent", "turnONLNA", "turnOFFLNA"] + CORBA.Object.__methods__
+    __methods__ = ["getTemperature", "getMagnetCurrent", "getMagnetVoltage", "getSISVoltage", "getSISCurrent", "getLNADrainVoltage", "getLNADrainCurrent", "getLNAGateVoltage", "setMagnetCurrent", "setSISVoltage", "setLNADrainVoltage", "setLNADrainCurrent", "setLNADrainVoltageCurrent", "turnONLNA", "turnOFFLNA"] + CORBA.Object.__methods__
 
 omniORB.registerObjref(BiasModuleCorba._NP_RepositoryId, _objref_BiasModuleCorba)
 _0_BiasCorba._objref_BiasModuleCorba = _objref_BiasModuleCorba
@@ -109,7 +113,7 @@ class BiasModuleCorba (PortableServer.Servant):
     _NP_RepositoryId = _0_BiasCorba.BiasModuleCorba._NP_RepositoryId
 
 
-    _omni_op_d = {"getTemperature": _0_BiasCorba.BiasModuleCorba._d_getTemperature, "getMagnetCurrent": _0_BiasCorba.BiasModuleCorba._d_getMagnetCurrent, "getMagnetVoltage": _0_BiasCorba.BiasModuleCorba._d_getMagnetVoltage, "getSISVoltage": _0_BiasCorba.BiasModuleCorba._d_getSISVoltage, "getSISCurrent": _0_BiasCorba.BiasModuleCorba._d_getSISCurrent, "getLNADrainVoltage": _0_BiasCorba.BiasModuleCorba._d_getLNADrainVoltage, "getLNADrainCurrent": _0_BiasCorba.BiasModuleCorba._d_getLNADrainCurrent, "getLNAGateVoltage": _0_BiasCorba.BiasModuleCorba._d_getLNAGateVoltage, "setMagnetCurrent": _0_BiasCorba.BiasModuleCorba._d_setMagnetCurrent, "setSISVoltage": _0_BiasCorba.BiasModuleCorba._d_setSISVoltage, "setLNADrainVoltage": _0_BiasCorba.BiasModuleCorba._d_setLNADrainVoltage, "setLNADrainCurrent": _0_BiasCorba.BiasModuleCorba._d_setLNADrainCurrent, "turnONLNA": _0_BiasCorba.BiasModuleCorba._d_turnONLNA, "turnOFFLNA": _0_BiasCorba.BiasModuleCorba._d_turnOFFLNA}
+    _omni_op_d = {"getTemperature": _0_BiasCorba.BiasModuleCorba._d_getTemperature, "getMagnetCurrent": _0_BiasCorba.BiasModuleCorba._d_getMagnetCurrent, "getMagnetVoltage": _0_BiasCorba.BiasModuleCorba._d_getMagnetVoltage, "getSISVoltage": _0_BiasCorba.BiasModuleCorba._d_getSISVoltage, "getSISCurrent": _0_BiasCorba.BiasModuleCorba._d_getSISCurrent, "getLNADrainVoltage": _0_BiasCorba.BiasModuleCorba._d_getLNADrainVoltage, "getLNADrainCurrent": _0_BiasCorba.BiasModuleCorba._d_getLNADrainCurrent, "getLNAGateVoltage": _0_BiasCorba.BiasModuleCorba._d_getLNAGateVoltage, "setMagnetCurrent": _0_BiasCorba.BiasModuleCorba._d_setMagnetCurrent, "setSISVoltage": _0_BiasCorba.BiasModuleCorba._d_setSISVoltage, "setLNADrainVoltage": _0_BiasCorba.BiasModuleCorba._d_setLNADrainVoltage, "setLNADrainCurrent": _0_BiasCorba.BiasModuleCorba._d_setLNADrainCurrent, "setLNADrainVoltageCurrent": _0_BiasCorba.BiasModuleCorba._d_setLNADrainVoltageCurrent, "turnONLNA": _0_BiasCorba.BiasModuleCorba._d_turnONLNA, "turnOFFLNA": _0_BiasCorba.BiasModuleCorba._d_turnOFFLNA}
 
 BiasModuleCorba._omni_skeleton = BiasModuleCorba
 _0_BiasCorba__POA.BiasModuleCorba = BiasModuleCorba

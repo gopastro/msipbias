@@ -18,7 +18,10 @@ function_dictionary = {
     'setMagnetCurrent': 'set_magnet_current',
     'setSISVoltage': 'set_sis_mixer_voltage',
     'setLNADrainVoltage': 'set_lna_drain_voltage',
-    'setLNADrainCurrent': 'set_lna_drain_current',    
+    'setLNADrainCurrent': 'set_lna_drain_current',
+    'setLNADrainVoltageCurrent': 'set_lna_drain_voltage_current',
+    'turnONLNA':  'turn_on_LNA',
+    'turnOFFLNA': 'turn_off_LNA',
     }
 
 class Bias_i (BiasCorba__POA.BiasModuleCorba):
@@ -158,6 +161,16 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         args = [current, lna, stage, polar]        
         self.setQuantity('setLNADrainCurrent', *args)
 
+    def setLNADrainVoltageCurrent(self, voltage, current, lna, stage, polar):
+        if lna not in (1, 2):
+            lna = 1
+        if stage not in (1, 2, 3):
+            stage = 1
+        if polar not in (0, 1):
+            polar = 0
+        args = [voltage, current, lna, stage, polar]        
+        self.setQuantity('setLNADrainVoltageCurrent', *args)        
+
     def turnONLNA(self, polar):
         """
         Turns on all three stages of LNA on 
@@ -165,13 +178,15 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         """
         if polar not in (0, 1):
             polar = 0
-        for iteration in range(2):
-            for lna in (1, 2):
-                for stage in (1, 2, 3):
-                    self.setLNADrainVoltage(0.7, lna, stage, polar=polar)
-                    time.sleep(0.05)
-                    self.setLNADrainCurrent(3.0, lna, stage, polar=polar)
-                    time.sleep(0.05)
+        args = [polar]
+        self.setQuantity('turnONLNA', *args)
+        # for iteration in range(2):
+        #     for lna in (1, 2):
+        #         for stage in (1, 2, 3):
+        #             self.setLNADrainVoltage(0.7, lna, stage, polar=polar)
+        #             time.sleep(0.05)
+        #             self.setLNADrainCurrent(3.0, lna, stage, polar=polar)
+        #             time.sleep(0.05)
 
     def turnOFFLNA(self, polar):
         """
@@ -180,13 +195,15 @@ class Bias_i (BiasCorba__POA.BiasModuleCorba):
         """
         if polar not in (0, 1):
             polar = 0
-        for iteration in range(2):
-            for lna in (1, 2):
-                for stage in (1, 2, 3):
-                    self.setLNADrainVoltage(0.0, lna, stage, polar=polar)
-                    time.sleep(0.05)
-                    self.setLNADrainCurrent(0.0, lna, stage, polar=polar)
-                    time.sleep(0.05)
+        args = [polar]
+        self.setQuantity('turnOFFLNA', *args)        
+        # for iteration in range(2):
+        #     for lna in (1, 2):
+        #         for stage in (1, 2, 3):
+        #             self.setLNADrainVoltage(0.0, lna, stage, polar=polar)
+        #             time.sleep(0.05)
+        #             self.setLNADrainCurrent(0.0, lna, stage, polar=polar)
+        #             time.sleep(0.05)
                     
 class BiasModuleServer:
     def __init__(self):
