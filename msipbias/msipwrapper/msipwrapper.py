@@ -5,7 +5,10 @@ from msipbias.biasmodule import BiasModule
 class MSIPWrapper():
     def __init__(self, debug=False):
         self.debug = debug
-
+        self.lock_status = False
+        self.chopper_status = 'SKY'
+        self.lo_power_voltage = 2.5
+        
     def chopper_in(self):
         chopper = Chopper(debug=self.debug)
         chop = chopper.chopper_in()
@@ -20,14 +23,37 @@ class MSIPWrapper():
 
     def chopper_state(self):
         chopper = Chopper(debug=self.debug)
-        chop = chopper.chopper_state()
+        self.chopper_status = chopper.chopper_state()
         chopper.close()
-        return chop
+        return self.chopper_status
 
     def pll_status(self):
         msiplo = MSIPLOSystem(debug=self.debug)
-        lock_status = msiplo.check_lock()
+        self.lock_status = msiplo.check_lock()
         msiplo.close()
-        return lock_status
+        return self.lock_status
 
-    
+    def lo_frequency(self, frequency):
+        """
+        Given frequency of LO at 1mm wavelength
+        call the MSIP LO System and locks the YIG and
+        the whole LO chain for appropriate frequency
+        Returns True if lock achieved, False if not
+        """
+        msiplo = MSIPLOSystem(debug=self.debug)
+        self.lock_status = msiplo.set_and_lock_frequency(frequency/3.0)
+        self.lo_power_voltage = msiplo.power_level_voltage
+        msiplo.close()
+        return self.lock_status
+
+    def lo_power(self, voltage):
+        """
+        Sets the drain voltage of the last MMIC
+        in LO chain to a voltage betwee 0 and 5.0 V
+        Larger voltages result in larger LO power
+        """
+        msiplo = MSIPLOSystem(debug=self.debug)
+        self.lo_power_voltage = msiplo.set_power_level_voltage(voltage)
+        msiplo.close()
+        return self.lo_power_voltage
+        
