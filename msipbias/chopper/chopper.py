@@ -50,7 +50,7 @@ class Chopper():
         if self.ambient == 1 and self.sky == 0:
             return 'SKY'
 
-    def close():
+    def close(self):
         self.u3dig.close()
 
         
