@@ -26,7 +26,7 @@ class MSIPWrapper():
 
     def pll_status(self):
         msiplo = MSIPLOSystem(debug=self.debug)
-        lock_status = ,msiplo.check_lock()
+        lock_status = msiplo.check_lock()
         msiplo.close()
         return lock_status
 
