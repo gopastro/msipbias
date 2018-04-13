@@ -23,8 +23,8 @@ class Chopper():
             logger.info("Setting Chopper in")
         self.u3dig.setDigitalState(4, 1)
         time.sleep(self.timeout)
-        self.ambient = self.getDigitalState(6)
-        self.sky = self.getDigitalState(7)
+        self.ambient = self.u3dig.getDigitalState(6)
+        self.sky = self.u3dig.getDigitalState(7)
         if self.ambient == 0 and self.sky == 1:
             return True
         else:
