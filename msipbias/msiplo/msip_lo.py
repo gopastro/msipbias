@@ -10,7 +10,7 @@ synth_powers = [16, 13, 13, 16, 15, 14, 14, 14, 14, 14, 14, 16, 13, 13, 13, 13, 
 
 
 class MSIPLOSystem():
-    def __init__(self, debug=True, prologix_host='192.168.1.101',
+    def __init__(self, debug=True, prologix_host='192.168.151.110',
                  prologix_port=1234, synth_address=19,
                  default_synth_power=13,
                  max_synth_power=16,
