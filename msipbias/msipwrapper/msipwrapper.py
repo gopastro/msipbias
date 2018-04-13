@@ -24,4 +24,10 @@ class MSIPWrapper():
         chopper.close()
         return chop
 
+    def pll_status(self):
+        msiplo = MSIPLOSystem(debug=self.debug)
+        lock_status = ,msiplo.check_lock()
+        msiplo.close()
+        return lock_status
+
     
