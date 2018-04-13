@@ -16,7 +16,7 @@ class Chopper():
         self.debug = debug
         self.timeout = timeout
         self.u3dig = U3DigitalIO(debug=self.debug)
-        self.chopper_out()
+        #self.chopper_out()
         
     def chopper_in(self):
         if self.debug:
