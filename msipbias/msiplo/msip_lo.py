@@ -51,6 +51,19 @@ class MSIPLOSystem():
         self.power_level_voltage = voltage
         self.labjack.setDAVoltage(0, self.power_level_voltage)
         time.sleep(0.010)
+
+    def check_lock(self):
+        self.IFLevel, self.loopVoltage = self.getVoltages()
+        if self.IFLevel < -0.1:
+            # level is pretty good
+            if numpy.abs(self.loopVoltage) < 0.1:
+                # already very low loopVoltage
+                return True
+            else:
+                return False
+        else:
+            return False
+
         
     def set_and_lock_frequency(self, flo, synth_power=None):
         """
