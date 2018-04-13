@@ -1120,6 +1120,9 @@ class BiasModule(object):
 
     def close_cheetah(self):
         ch_close(self.handle)
+
+    def close(sefl):
+        self.close_cheetah()
         
 def send_bytes(handle, byte0, byte1):
     data_out = array('B', [0 for i in range(2)])

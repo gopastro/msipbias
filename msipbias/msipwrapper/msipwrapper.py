@@ -33,7 +33,7 @@ class MSIPWrapper():
         msiplo.close()
         return self.lock_status
 
-    def lo_frequency(self, frequency):
+    def set_lo_frequency(self, frequency):
         """
         Given frequency of LO at 1mm wavelength
         call the MSIP LO System and locks the YIG and
@@ -46,7 +46,7 @@ class MSIPWrapper():
         msiplo.close()
         return self.lock_status
 
-    def lo_power(self, voltage):
+    def set_lo_power(self, voltage):
         """
         Sets the drain voltage of the last MMIC
         in LO chain to a voltage betwee 0 and 5.0 V
@@ -56,4 +56,15 @@ class MSIPWrapper():
         self.lo_power_voltage = msiplo.set_power_level_voltage(voltage)
         msiplo.close()
         return self.lo_power_voltage
-        
+
+    def get_lo_power(self):
+        return self.lo_power_voltage
+
+    def get_temperature(self, channel):
+        bm = BiasModule(debug=self.debug)
+        lisdic = bm.monitor_temperature()
+        dic = {}
+        for l in lisdic:
+            dic[l['channel']] =l['temperature']
+        bm.close()
+        return dic.get(channel)
