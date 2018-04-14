@@ -94,10 +94,15 @@ class MSIP1mmSocketServer():
             if msg[0] == 'pll_status':
                 pll_status = self.pll_status()
                 self.send("%s DONE; %s\n" % (self.data.strip(), str(pll_status)))
-            # elif msg[0] == 'config':
-            #     self.config(msg[1], msg[2])
-            # elif msg[0] == 'start':
-            #     self.start()
+            elif msg[0] == 'chopper_in':
+                chopper_status = self.chopper_in()
+                self.send("%s DONE; %s\n" % (self.data.strip(), str(chopper_status)))
+            elif msg[0] == 'chopper_out':
+                chopper_status = self.chopper_out()
+                self.send("%s DONE; %s\n" % (self.data.strip(), str(chopper_status)))
+            elif msg[0] == 'chopper_status':
+                chopper_status = self.chopper_status()
+                self.send("%s DONE; %s\n" % (self.data.strip(), str(chopper_status)))
             # elif msg[0] == 'stop':
             #     self.stop()
             # elif msg[0] == 'close':
@@ -140,8 +145,17 @@ class MSIP1mmSocketServer():
     #     return self.specw.snapsend()        
 
     def pll_status(self):
-            return self.msip.pll_status()
-    
+        return self.msip.pll_status()
+        
+    def chopper_in(self):
+        return self.msip.chopper_in()
+
+    def chopper_out(self):
+        return self.msip.chopper_out()
+
+    def chopper_status(self):
+        return self.msip.chopper_state()    
+        
     def conn_close(self):
         if self.conn:
             self.conn.close()
