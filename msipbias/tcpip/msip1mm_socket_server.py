@@ -99,13 +99,13 @@ class MSIP1mmSocketServer():
                 self.send("%s %s\n" % (self.data.strip(), str(chopper_status)))
             elif msg[0] == 'chopper_sky':
                 chopper_status = self.chopper_out()
-                self.send("%s  %s\n" % (self.data.strip(), str(chopper_status)))
+                self.send("%s %s\n" % (self.data.strip(), str(chopper_status)))
             elif msg[0] == 'chopper_status':
                 chopper_status = self.chopper_status()
-                self.send("%s  %s\n" % (self.data.strip(), str(chopper_status)))
+                self.send("%s %s\n" % (self.data.strip(), str(chopper_status)))
             elif msg[0] == 'lo1_freq':
                 lock_status = self.set_lo_freq(msg[1])
-                self.send("%s  %s\n" % (self.data.strip(), str(lock_status)))
+                self.send("%s %s\n" % (self.data.strip(), str(lock_status)))
             # elif msg[0] == 'close':
             #     self.spec_close()
             # elif msg[0] == 'snapshot':
