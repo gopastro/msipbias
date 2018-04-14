@@ -86,7 +86,7 @@ class MSIPLOSystem():
         Sets corresponding YIG frequency and adjusts it 
         till stable lock is achieved
         """
-        self.flo = flo - 0.1 # remove 100 MHz offset
+        self.flo = flo - 0.1 - 2e-6# remove 100 MHz offset and an additional 2kHz offset for synth
         if synth_power is not None:
             self.synth_power = synth_power
         else:
