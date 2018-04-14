@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+import sys
+from optparse import OptionParser
+from msipbias.tcpip.msip1mm_socket_server import MSIP1mmSocketServer
+from msipbias.logging import logger
+import daemon
+from daemon import pidfile
+
+logger.name = __name__
+
+def start_msip_server(options):
+    msip_sock = MSIP1mmSocketServer(HOST=options.hostname,
+                                    PORT=options.portnumber
+                                    )
+    logger.info("MSIP1mm Socket server started")
+    logger.info("Waiting for socket connection from client")
+    msip_sock.listen(10)
+    while True:
+        msip_sock.accept()
+        while True:
+            if msip_sock.process_msip_command():
+                #print "Processed command"
+                logger.info("Processed command")
+                #print "Ctrl-C to quit"
+                logger.info( "Ctrl-C to quit")
+            else:
+                msip_sock.conn_close()
+                break
+                                     
+# def start_daemon(options):
+#     print "Starting Daemon"
+#     with daemon.DaemonContext(
+#             pidfile=pidfile.TimeoutPIDLockFile(options.pidfile),
+#     ) as context:
+#         start_spectometer(options)
+
+
+
+if __name__ == '__main__':
+    usage = "usage: %prog [options]"
+    parser = OptionParser(usage=usage)
+    parser.add_option("-H", "--hostname", dest="hostname",
+                      action="store", default="localhost",
+                      help="Hostname for server (default %default)")
+    parser.add_option("-p", "--port", dest="portnumber",
+                      action="store", type="int",
+                      default=9221,
+                      help="Port for msip server to bind on (default %default)")
+    parser.add_option('-P', '--pid-file', dest="pidfile", 
+                      action="store", default='/var/run/msip_daemon.pid',
+                      help="pid file location (default %default)")
+    (options, args) = parser.parse_args()
+    start_spectrometer(options)
+    

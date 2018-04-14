@@ -12,7 +12,7 @@ setup(
     description='Python tools for 1mm MSIP Receiver Bias',
     author='Gopal Narayanan <gopal@astro.umass.edu>',
     packages=find_packages(),
-    scripts=['bin/msipbiasgui', 'bin/msiptempmonitor'],
+    scripts=['bin/msipbiasgui', 'bin/msiptempmonitor', 'bin/msipserver'],
     include_package_data=True,
     package_data = {
         '' : ['*.ui', '*.txt'],
