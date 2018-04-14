@@ -90,7 +90,8 @@ class MSIP1mmSocketServer():
             msg = self.data.strip().split()
             if not msg[0] in allowed_commands:
                 logger.error("Request has to be one of %s" % allowed_commands)
-                return False
+                self.send("%s no_such_command\n" % self.data.strip())
+                return True
             if msg[0] == 'pll_status':
                 pll_status = self.pll_status()
                 self.send("%s %s\n" % (self.data.strip(), str(pll_status)))
