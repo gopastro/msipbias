@@ -28,7 +28,7 @@ class MSIPWrapper():
         return self.chopper_status
 
     def pll_status(self):
-        msiplo = MSIPLOSystem(debug=self.debug)
+        msiplo = MSIPLOSystem(debug=self.debug, check_pll=True)
         self.lock_status = msiplo.check_lock()
         msiplo.close()
         return self.lock_status

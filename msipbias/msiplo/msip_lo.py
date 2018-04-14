@@ -20,7 +20,8 @@ class MSIPLOSystem():
                  start_power_level_voltage=2.5,
                  min_synth_power=10,
                  numIterations=100,
-                 maxLoopIterations=10):
+                 maxLoopIterations=10,
+                 check_pll=False):
         self.offset = 0.0125 # GHz
         self.debug = debug
         self.maxLoopIterations = maxLoopIterations
@@ -36,7 +37,9 @@ class MSIPLOSystem():
         self.start_power_level_voltage = start_power_level_voltage
         self.labjack = U3AnalogIn(debug=self.debug,
                                   numIterations=numIterations)
-        self.set_power_level_voltage(self.start_power_level_voltage)
+        if not check_pll:
+            # If checking for PLL status only do not disturb power level voltage
+            self.set_power_level_voltage(self.start_power_level_voltage)
         #self.power_level_voltage = self.start_power_level_voltage
         # Open YIG synth
         self.ml = MicroLambda(debug=self.debug)
