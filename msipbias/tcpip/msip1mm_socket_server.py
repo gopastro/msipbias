@@ -103,8 +103,9 @@ class MSIP1mmSocketServer():
             elif msg[0] == 'chopper_status':
                 chopper_status = self.chopper_status()
                 self.send("%s DONE; %s\n" % (self.data.strip(), str(chopper_status)))
-            # elif msg[0] == 'stop':
-            #     self.stop()
+            elif msg[0] == 'lo_freq':
+                lock_status = self.set_lo_freq(msg[1])
+                self.send("%s DONE; %s\n" % (self.data.strip(), str(lock_status)))
             # elif msg[0] == 'close':
             #     self.spec_close()
             # elif msg[0] == 'snapshot':
@@ -154,7 +155,11 @@ class MSIP1mmSocketServer():
         return self.msip.chopper_out()
 
     def chopper_status(self):
-        return self.msip.chopper_state()    
+        return self.msip.chopper_state()
+
+    def set_lo_freq(self, freqstr):
+        lo_frequency = float(freqstr)
+        return self.msip.set_lo_frequency(lo_frequency)
         
     def conn_close(self):
         if self.conn:
