@@ -46,9 +46,9 @@ class Chopper():
         self.ambient = self.u3dig.getDigitalState(6)
         self.sky = self.u3dig.getDigitalState(7)        
         if self.ambient == 0 and self.sky == 1:
-            return 'AMB'
+            return 'load'
         if self.ambient == 1 and self.sky == 0:
-            return 'SKY'
+            return 'sky'
 
     def close(self):
         self.u3dig.close()
