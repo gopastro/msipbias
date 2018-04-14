@@ -15,8 +15,7 @@ from msipbias.msipwrapper import MSIPWrapper
 import SocketServer
 logger.name = __name__
 
-allowed_commands = ['lo1_freq', 'pll_status', 'chopper_load',
-                    'chopper_sky', 'chopper_status']
+allowed_commands = ['lo1_freq', 'pll_status', 'chopper']
 
 class MSIP1mmSocketServer():
     debug = 0
@@ -94,19 +93,20 @@ class MSIP1mmSocketServer():
                 return True
             if msg[0] == 'pll_status':
                 pll_status = self.pll_status()
-                self.send("%s %s\n" % (self.data.strip(), str(pll_status)))
-            elif msg[0] == 'chopper_load':
-                chopper_status = self.chopper_in()
-                self.send("%s %s\n" % (self.data.strip(), str(chopper_status)))
-            elif msg[0] == 'chopper_sky':
-                chopper_status = self.chopper_out()
-                self.send("%s %s\n" % (self.data.strip(), str(chopper_status)))
-            elif msg[0] == 'chopper_status':
-                chopper_status = self.chopper_status()
-                self.send("%s %s\n" % (self.data.strip(), str(chopper_status)))
+                self.send("%s %s\n" % (self.data.strip(), str(pll_status).lower()))
+            elif msg[0] == 'chopper':
+                if msg[1] == 'load':
+                    chopper_status = self.chopper_in()
+                    self.send("%s %s\n" % (self.data.strip(), str(chopper_status).lower()))
+                elif msg[1] == 'sky':
+                    chopper_status = self.chopper_out()
+                    self.send("%s %s\n" % (self.data.strip(), str(chopper_status).lower()))
+                elif msg[1] == 'status':
+                    chopper_status = self.chopper_status()
+                    self.send("%s %s\n" % (self.data.strip(), str(chopper_status).lower()))
             elif msg[0] == 'lo1_freq':
                 lock_status = self.set_lo_freq(msg[1])
-                self.send("%s %s\n" % (self.data.strip(), str(lock_status)))
+                self.send("%s %s\n" % (self.data.strip(), str(lock_status).lower()))
             # elif msg[0] == 'close':
             #     self.spec_close()
             # elif msg[0] == 'snapshot':

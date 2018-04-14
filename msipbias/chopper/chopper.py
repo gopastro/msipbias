@@ -26,9 +26,9 @@ class Chopper():
         self.ambient = self.u3dig.getDigitalState(6)
         self.sky = self.u3dig.getDigitalState(7)
         if self.ambient == 0 and self.sky == 1:
-            return True
+            return 'load'
         else:
-            return False
+            return 'error'
 
     def chopper_out(self):
         if self.debug:
@@ -38,18 +38,20 @@ class Chopper():
         self.ambient = self.u3dig.getDigitalState(6)
         self.sky = self.u3dig.getDigitalState(7)
         if self.ambient == 1 and self.sky == 0:
-            return True
+            return 'sky'
         else:
-            return False
+            return 'error'
 
     def chopper_state(self):
         self.ambient = self.u3dig.getDigitalState(6)
         self.sky = self.u3dig.getDigitalState(7)        
         if self.ambient == 0 and self.sky == 1:
             return 'load'
-        if self.ambient == 1 and self.sky == 0:
+        elif self.ambient == 1 and self.sky == 0:
             return 'sky'
-
+        else:
+            return 'error'
+        
     def close(self):
         self.u3dig.close()
 
