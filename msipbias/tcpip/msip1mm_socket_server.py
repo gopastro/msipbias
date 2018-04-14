@@ -93,20 +93,20 @@ class MSIP1mmSocketServer():
                 return True
             if msg[0] == 'pll_status':
                 pll_status = self.pll_status()
-                self.send("%s %s\n" % (self.data.strip(), str(pll_status).lower()))
+                self.send("%s %s\n" % (msg[0], str(pll_status).lower()))
             elif msg[0] == 'chopper':
                 if msg[1] == 'load':
                     chopper_status = self.chopper_in()
-                    self.send("%s %s\n" % (self.data.strip(), str(chopper_status).lower()))
+                    self.send("%s %s\n" % (msg[0], str(chopper_status).lower()))
                 elif msg[1] == 'sky':
                     chopper_status = self.chopper_out()
-                    self.send("%s %s\n" % (self.data.strip(), str(chopper_status).lower()))
+                    self.send("%s %s\n" % (msg[0], str(chopper_status).lower()))
                 elif msg[1] == 'status':
                     chopper_status = self.chopper_status()
-                    self.send("%s %s\n" % (self.data.strip(), str(chopper_status).lower()))
+                    self.send("%s %s\n" % (msg[0], str(chopper_status).lower()))
             elif msg[0] == 'lo1_freq':
                 lock_status = self.set_lo_freq(msg[1])
-                self.send("%s %s\n" % (self.data.strip(), str(lock_status).lower()))
+                self.send("%s %s\n" % (msg[0], str(lock_status).lower()))
             # elif msg[0] == 'close':
             #     self.spec_close()
             # elif msg[0] == 'snapshot':
@@ -116,9 +116,9 @@ class MSIP1mmSocketServer():
             # #print self.data
             # logger.info("Received Data: %s" % self.data)
             # if msg[0] == 'snapsend':
-            #     self.send("%s  %.2f %.2f %.2f %.2f\n" % (self.data.strip(), snaps[0], snaps[1], snaps[2], snaps[3]))
+            #     self.send("%s  %.2f %.2f %.2f %.2f\n" % (msg[0], snaps[0], snaps[1], snaps[2], snaps[3]))
             # else:
-            #     self.send("%s DONE\n" % self.data.strip())
+            #     self.send("%s DONE\n" % msg[0])
         return True
 
     # def config(self, mode, dump_time):
