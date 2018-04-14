@@ -50,5 +50,5 @@ if __name__ == '__main__':
                       action="store", default='/var/run/msip_daemon.pid',
                       help="pid file location (default %default)")
     (options, args) = parser.parse_args()
-    start_spectrometer(options)
+    start_msip_server(options)
     
