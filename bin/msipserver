@@ -40,15 +40,12 @@ if __name__ == '__main__':
     usage = "usage: %prog [options]"
     parser = OptionParser(usage=usage)
     parser.add_option("-H", "--hostname", dest="hostname",
-                      action="store", default="localhost",
+                      action="store", default="0.0.0.0",
                       help="Hostname for server (default %default)")
     parser.add_option("-p", "--port", dest="portnumber",
                       action="store", type="int",
                       default=9221,
                       help="Port for msip server to bind on (default %default)")
-    parser.add_option('-P', '--pid-file', dest="pidfile", 
-                      action="store", default='/var/run/msip_daemon.pid',
-                      help="pid file location (default %default)")
     (options, args) = parser.parse_args()
     start_msip_server(options)
     

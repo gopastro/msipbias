@@ -15,15 +15,15 @@ from msipbias.msipwrapper import MSIPWrapper
 import SocketServer
 logger.name = __name__
 
-allowed_commands = ['lo_freq', 'pll_status', 'chopper_in',
-                    'chopper_out', 'chopper_status']
+allowed_commands = ['lo1_freq', 'pll_status', 'chopper_load',
+                    'chopper_sky', 'chopper_status']
 
 class MSIP1mmSocketServer():
     debug = 0
     status_bytes = []
     status_dict = {}
 
-    def __init__(self, HOST=None, PORT=None):
+    def __init__(self, HOST='0.0.0.0', PORT=None):
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             if HOST:
@@ -93,19 +93,19 @@ class MSIP1mmSocketServer():
                 return False
             if msg[0] == 'pll_status':
                 pll_status = self.pll_status()
-                self.send("%s DONE; %s\n" % (self.data.strip(), str(pll_status)))
-            elif msg[0] == 'chopper_in':
+                self.send("%s %s\n" % (self.data.strip(), str(pll_status)))
+            elif msg[0] == 'chopper_load':
                 chopper_status = self.chopper_in()
-                self.send("%s DONE; %s\n" % (self.data.strip(), str(chopper_status)))
-            elif msg[0] == 'chopper_out':
+                self.send("%s %s\n" % (self.data.strip(), str(chopper_status)))
+            elif msg[0] == 'chopper_sky':
                 chopper_status = self.chopper_out()
-                self.send("%s DONE; %s\n" % (self.data.strip(), str(chopper_status)))
+                self.send("%s  %s\n" % (self.data.strip(), str(chopper_status)))
             elif msg[0] == 'chopper_status':
                 chopper_status = self.chopper_status()
-                self.send("%s DONE; %s\n" % (self.data.strip(), str(chopper_status)))
-            elif msg[0] == 'lo_freq':
+                self.send("%s  %s\n" % (self.data.strip(), str(chopper_status)))
+            elif msg[0] == 'lo1_freq':
                 lock_status = self.set_lo_freq(msg[1])
-                self.send("%s DONE; %s\n" % (self.data.strip(), str(lock_status)))
+                self.send("%s  %s\n" % (self.data.strip(), str(lock_status)))
             # elif msg[0] == 'close':
             #     self.spec_close()
             # elif msg[0] == 'snapshot':
@@ -115,7 +115,7 @@ class MSIP1mmSocketServer():
             # #print self.data
             # logger.info("Received Data: %s" % self.data)
             # if msg[0] == 'snapsend':
-            #     self.send("%s DONE; %.2f %.2f %.2f %.2f\n" % (self.data.strip(), snaps[0], snaps[1], snaps[2], snaps[3]))
+            #     self.send("%s  %.2f %.2f %.2f %.2f\n" % (self.data.strip(), snaps[0], snaps[1], snaps[2], snaps[3]))
             # else:
             #     self.send("%s DONE\n" % self.data.strip())
         return True
@@ -182,45 +182,4 @@ class MSIP1mmSocketServer():
     def close(self):
         self.sock.close()
 
-
-
-class SpecTCPHandler(SocketServer.BaseRequestHandler):
-    '''Base class for msip1mm tcpip socket communications.
-    Do not use this use the MSIP1mmSocketServer class instead
-    '''
-    def __init__(self, request, client_address, server):
-        #self.logger = logging.getLogger('SpecRequestHandler')
-        #self.logger.debug('__init__')
-        SocketServer.BaseRequestHandler.__init__(self, request, client_address, server)
-        return
-
-    def setup(self):
-        # any special setup we need here first
-        self.msip = MSIPWrapper(debug=True)
-        return SocketServer.BaseRequestHandler.setup(self)
-
-    def handle(self):
-        # self.request is the TCP socket connected to the client
-        self.data = self.request.recv(1024).strip()
-        print "{} wrote:".format(self.client_address[0])
-        print self.data
-        # just send back the same data, but upper-cased
-        self.request.sendall(self.data.upper())
-        msg = self.data.split()
-        if not msg[0] in allowed_commands:
-            print "Request has to be one of %s" % allowed_commands
-        if msg[0] == 'lo_freq':
-            self.lo_freq(msg[1])
-        elif msg[0] == 'pll_status':
-            pll_status = self.pll_status()
-            self.request_sendall(str(pll_status))
-        # elif msg[0] == 'start':
-        #     self.start()
-        # elif msg[0] == 'stop':
-        #     self.stop()
-        # elif msg[0] == 'close':
-        #     self.close()
-
-        def pll_status(self):
-            return self.msip.pll_status()
 
