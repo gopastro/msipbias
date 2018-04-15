@@ -3,7 +3,7 @@ import socket
 class Synthesizer:
     #def __init__(self, host='192.168.1.101',
     def __init__(self, host='192.168.151.110',
-                 port=1234, synth_address=20):
+                 port=1234, synth_address=19):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((host, port))
         self.synth_address = synth_address

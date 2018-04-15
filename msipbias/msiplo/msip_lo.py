@@ -14,7 +14,7 @@ synth_powers = [16, 13, 13, 16, 15, 14, 14, 14, 14, 14, 14, 16, 13, 13, 13, 13, 
 
 class MSIPLOSystem():
     def __init__(self, debug=True, prologix_host='192.168.151.110',
-                 prologix_port=1234, synth_address=20,
+                 prologix_port=1234, synth_address=19,
                  default_synth_power=13,
                  max_synth_power=16,
                  start_power_level_voltage=2.5,
@@ -86,7 +86,7 @@ class MSIPLOSystem():
         Sets corresponding YIG frequency and adjusts it 
         till stable lock is achieved
         """
-        self.flo = flo - 0.1 - ((2/6.)*1e-6)# remove 100 MHz offset and an additional 2kHz offset for synth
+        self.flo = flo - 0.1 #- ((2/6.)*1e-6)# remove 100 MHz offset and an additional 2kHz offset for synth
         if synth_power is not None:
             self.synth_power = synth_power
         else:
