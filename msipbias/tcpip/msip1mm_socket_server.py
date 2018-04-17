@@ -87,6 +87,9 @@ class MSIP1mmSocketServer():
             return False
         else:
             msg = self.data.strip().split()
+            if not msg:
+                logger.error("No command sent")
+                return True
             if not msg[0] in allowed_commands:
                 logger.error("Request has to be one of %s" % allowed_commands)
                 self.send("%s no_such_command\n" % self.data.strip())
