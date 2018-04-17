@@ -88,6 +88,7 @@ class MSIP1mmSocketServer():
         else:
             msg = self.data.strip().split()
             if not msg:
+                self.send("No command issued\n")
                 logger.error("No command sent")
                 return True
             if not msg[0] in allowed_commands:
