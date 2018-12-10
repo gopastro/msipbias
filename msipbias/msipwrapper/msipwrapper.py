@@ -40,7 +40,8 @@ class MSIPWrapper():
         the whole LO chain for appropriate frequency
         Returns True if lock achieved, False if not
         """
-        msiplo = MSIPLOSystem(debug=self.debug)
+        msiplo = MSIPLOSystem(debug=self.debug,
+                              start_power_level_voltage=self.lo_power_voltage)
         self.lock_status = msiplo.set_and_lock_frequency(frequency/3.0)
         self.lo_power_voltage = msiplo.power_level_voltage
         msiplo.close()
