@@ -165,6 +165,8 @@ class MSIPLOSystem():
                 break
         self.numLoop = numLoop
         if locked:
+            # set power level voltage one more time
+            self.set_power_level_voltage(self.start_power_level_voltage)            
             return True
         else:
             return False
