@@ -3,11 +3,11 @@ from msipbias.msiplo.msip_lo import MSIPLOSystem
 from msipbias.biasmodule import BiasModule
 
 class MSIPWrapper():
-    def __init__(self, debug=False):
+    def __init__(self, debug=False, lo_power_voltage=2.5):
         self.debug = debug
         self.lock_status = False
         self.chopper_status = 'SKY'
-        self.lo_power_voltage = 2.5
+        self.lo_power_voltage = lo_power_voltage
         
     def chopper_in(self):
         chopper = Chopper(debug=self.debug)

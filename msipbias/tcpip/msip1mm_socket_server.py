@@ -164,6 +164,9 @@ class MSIP1mmSocketServer():
 
     def set_lo_freq(self, freqstr):
         lo_frequency = float(freqstr)
+        if lo_frequency >= 250.0 and lo_frequency < 258.0:
+            # Need to lower drain voltage for these frequencies
+            self.msip = MSIPWrapper(debug=True, lo_power_voltage=0.75)
         return self.msip.set_lo_frequency(lo_frequency)
         
     def conn_close(self):
