@@ -7,7 +7,8 @@ import numpy
 
 class U3AnalogIn():
     def __init__(self, numChannels=2,
-                 numIterations=1000, debug=False):
+                 numIterations=1000, debug=False,
+                 config=True):
         self.debug = debug
         self.dev = u3.U3()
         self.caldata = self.dev.getCalibrationData()
@@ -16,8 +17,9 @@ class U3AnalogIn():
         self.numChannels = numChannels
         #self.latestAinValues = [0] * self.numChannels
         self.numIterations = numIterations
-        self.checkHV()
-        self.configIO()
+        if config:
+            self.checkHV()
+            self.configIO()
 
     def checkHV(self):
         # Check if the U3 is an HV

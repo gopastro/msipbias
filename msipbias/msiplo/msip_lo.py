@@ -39,8 +39,14 @@ class MSIPLOSystem():
         self.min_synth_power = min_synth_power
         # Open Labjack to read voltages
         self.start_power_level_voltage = start_power_level_voltage
-        self.labjack = U3AnalogIn(debug=self.debug,
-                                  numIterations=numIterations)
+        if check_pll:
+            self.labjack = U3AnalogIn(debug=self.debug,
+                                      numIterations=numIterations,
+                                      config=False)
+        else:
+            self.labjack = U3AnalogIn(debug=self.debug,
+                                      numIterations=numIterations,
+                                      config=True)            
         if not check_pll:
             # If checking for PLL status only do not disturb power level voltage
             print "Setting power level on msip_lo init %s" % self.start_power_level_voltage
