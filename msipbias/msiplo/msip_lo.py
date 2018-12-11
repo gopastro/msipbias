@@ -43,6 +43,7 @@ class MSIPLOSystem():
                                   numIterations=numIterations)
         if not check_pll:
             # If checking for PLL status only do not disturb power level voltage
+            print "Setting power level on msip_lo init %s" % self.start_power_level_voltage
             self.set_power_level_voltage(self.start_power_level_voltage)
         #self.power_level_voltage = self.start_power_level_voltage
         # Open YIG synth
@@ -166,7 +167,7 @@ class MSIPLOSystem():
         self.numLoop = numLoop
         if locked:
             # set power level voltage one more time
-            self.set_power_level_voltage(self.start_power_level_voltage)            
+            self.set_power_level_voltage(self.power_level_voltage)            
             return True
         else:
             return False
