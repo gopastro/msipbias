@@ -8,6 +8,7 @@ class MSIPWrapper():
         self.lock_status = False
         self.chopper_status = 'SKY'
         self.lo_power_voltage = lo_power_voltage
+        print "Initializing with LO power voltage: %s" % self.lo_power_voltage
         
     def chopper_in(self):
         chopper = Chopper(debug=self.debug)
