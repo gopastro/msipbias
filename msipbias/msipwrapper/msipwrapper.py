@@ -8,7 +8,7 @@ class MSIPWrapper():
         self.lock_status = False
         self.chopper_status = 'SKY'
         self.lo_power_voltage = lo_power_voltage
-        print "Initializing with LO power voltage: %s" % self.lo_power_voltage
+        #print "Initializing with LO power voltage: %s" % self.lo_power_voltage
         
     def chopper_in(self):
         chopper = Chopper(debug=self.debug)
@@ -29,7 +29,8 @@ class MSIPWrapper():
         return self.chopper_status
 
     def pll_status(self):
-        msiplo = MSIPLOSystem(debug=self.debug, check_pll=True)
+        msiplo = MSIPLOSystem(debug=self.debug, check_pll=True,
+                              start_power_level_voltage=self.lo_power_voltage)
         self.lock_status = msiplo.check_lock()
         msiplo.close()
         return self.lock_status
@@ -54,7 +55,9 @@ class MSIPWrapper():
         in LO chain to a voltage betwee 0 and 5.0 V
         Larger voltages result in larger LO power
         """
-        msiplo = MSIPLOSystem(debug=self.debug)
+        # don't want to change LO so set check_pll True
+        msiplo = MSIPLOSystem(debug=self.debug, check_pll=True, 
+                              start_power_level_voltage=self.lo_power_voltage)
         self.lo_power_voltage = msiplo.set_power_level_voltage(voltage)
         msiplo.close()
         return self.lo_power_voltage
