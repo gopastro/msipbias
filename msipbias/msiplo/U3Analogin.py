@@ -65,8 +65,10 @@ class U3AnalogIn():
                     lowVoltage = False
                 else:
                     lowVoltage = True
-                self.latestAinValues[j, i] = self.dev.binaryToCalibratedAnalogVoltage(results[2 + j],
-                                                                              isLowVoltage=lowVoltage, isSingleEnded=True)
+                #self.latestAinValues[j, i] = self.dev.binaryToCalibratedAnalogVoltage(results[2 + j],
+                #isLowVoltage=lowVoltage, isSingleEnded=True)
+                self.latestAinValues[j, i] = self.dev.binaryToCalibratedAnalogVoltage(results[j],
+                                                                              isLowVoltage=lowVoltage, isSingleEnded=True)                
             i += 1
         end = datetime.now()
         delta = end - start
