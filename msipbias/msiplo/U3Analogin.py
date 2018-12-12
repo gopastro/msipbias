@@ -17,8 +17,8 @@ class U3AnalogIn():
         self.numChannels = numChannels
         #self.latestAinValues = [0] * self.numChannels
         self.numIterations = numIterations
+        self.checkHV()
         if config:
-            self.checkHV()
             self.configIO()
 
     def checkHV(self):
