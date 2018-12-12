@@ -11,7 +11,7 @@ class U3AnalogIn():
                  config=True):
         self.debug = debug
         self.dev = u3.U3()
-        self.caldata = self.dev.getCalibrationData()
+        #self.caldata = self.dev.getCalibrationData()
         self.quickSample = 1
         self.longSettling = 0
         self.numChannels = numChannels
@@ -44,8 +44,8 @@ class U3AnalogIn():
             numIterations = self.numIterations
 
         self.feedbackArguments = []
-        self.feedbackArguments.append(u3.DAC0_8(Value=125))
-        self.feedbackArguments.append(u3.PortStateRead())
+        #self.feedbackArguments.append(u3.DAC0_8(Value=125))
+        #self.feedbackArguments.append(u3.PortStateRead())
 
         for i in range(self.numChannels):
             self.feedbackArguments.append(u3.AIN(i, 31,
