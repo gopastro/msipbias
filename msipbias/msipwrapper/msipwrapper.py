@@ -1,6 +1,7 @@
 from msipbias.chopper import Chopper
 from msipbias.msiplo.msip_lo import MSIPLOSystem
 from msipbias.biasmodule import BiasModule
+import time
 
 class MSIPWrapper():
     def __init__(self, debug=False, lo_power_voltage=2.5):
@@ -65,6 +66,30 @@ class MSIPWrapper():
     def get_lo_power(self):
         return self.lo_power_voltage
 
+    def lo_synth_off(self):
+        try:
+            msiplo = MSIPLOSystem(debug=self.debug, check_pll=True, 
+                                  start_power_level_voltage=self.lo_power_voltage)
+            msiplo.synth_output_off()
+            time.sleep(2.0)
+            status = msiplo.get_synth_output_status()
+            msiplo.close()
+            return status
+        except:
+            return "ERR"
+
+    def lo_synth_on(self):
+        try:
+            msiplo = MSIPLOSystem(debug=self.debug, check_pll=True, 
+                                  start_power_level_voltage=self.lo_power_voltage)
+            msiplo.synth_output_on()
+            time.sleep(2.0)
+            status = msiplo.get_synth_output_status()
+            msiplo.close()
+            return status
+        except:
+            return "ERR"
+        
     def get_temperature(self, channel):
         bm = BiasModule(debug=self.debug)
         lisdic = bm.monitor_temperature()

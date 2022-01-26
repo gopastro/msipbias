@@ -400,6 +400,15 @@ class MSIPLOSystem():
         else:
             return False
 
+    def synth_output_on(self):
+        self.synth.output_on()  # in case RF was OFF
+
+    def synth_output_off(self):
+        self.synth.output_off()
+
+    def get_synth_output_status(self):
+        return self.synth.output_status()
+
     def close(self):
         self.synth.close()
         self.ml.close_cheetah()
