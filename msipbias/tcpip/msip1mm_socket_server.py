@@ -15,7 +15,7 @@ from msipbias.msipwrapper import MSIPWrapper
 import SocketServer
 logger.name = __name__
 
-allowed_commands = ['lo1_freq', 'pll_status', 'chopper']
+allowed_commands = ['lo1_freq', 'pll_status', 'chopper', 'lo_synth']
 
 class MSIP1mmSocketServer():
     debug = 0
@@ -111,6 +111,13 @@ class MSIP1mmSocketServer():
             elif msg[0] == 'lo1_freq':
                 lock_status = self.set_lo_freq(msg[1])
                 self.send("%s %s\n" % (msg[0], str(lock_status).lower()))
+            elif msg[0] == 'lo_synth':
+                if msg[1] == 'on':
+                    lo_synth_status = self.lo_synth_RF_on()
+                    self.send("%s %s\n" % (msg[0], str(lo_synth_status).lower()))
+                elif msg[1] == 'off':
+                    lo_synth_status = self.lo_synth_RF_off()
+                    self.send("%s %s\n" % (msg[0], str(lo_synth_status).lower()))
             # elif msg[0] == 'close':
             #     self.spec_close()
             # elif msg[0] == 'snapshot':
@@ -171,7 +178,15 @@ class MSIP1mmSocketServer():
         else:
             self.msip = MSIPWrapper(debug=True)
         return self.msip.set_lo_frequency(lo_frequency)
-        
+
+    def lo_synth_RF_on(self):
+        self.msip = MSIPWrapper(debug=True, lo_power_voltage=0.75)
+        return self.msip.lo_synth_on()
+
+    def lo_synth_RF_off(self):
+        self.msip = MSIPWrapper(debug=True, lo_power_voltage=0.75)
+        return self.msip.lo_synth_off()    
+
     def conn_close(self):
         if self.conn:
             self.conn.close()
