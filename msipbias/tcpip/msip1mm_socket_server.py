@@ -15,7 +15,7 @@ from msipbias.msipwrapper import MSIPWrapper
 import SocketServer
 logger.name = __name__
 
-allowed_commands = ['lo1_freq', 'pll_status', 'chopper', 'lo_synth']
+allowed_commands = ['lo1_freq', 'pll_status', 'chopper', 'lo_synth', 'get_temperature']
 
 class MSIP1mmSocketServer():
     debug = 0
@@ -118,6 +118,12 @@ class MSIP1mmSocketServer():
                 elif msg[1] == 'off':
                     lo_synth_status = self.lo_synth_RF_off()
                     self.send("%s %s\n" % (msg[0], str(lo_synth_status).lower()))
+            elif msg[0] == 'get_temperature':
+                if msg[1] in ('1', '2', '3', '4', '5', '6'):
+                    temperature = self.get_temperature(msg[1])
+                    self.send("%s Channel %s %s K" % (msg[0], msg[1], temperature))
+                else:
+                    self.send("%s no_such_channel %s\n" % msg[1])
             # elif msg[0] == 'close':
             #     self.spec_close()
             # elif msg[0] == 'snapshot':
@@ -186,6 +192,10 @@ class MSIP1mmSocketServer():
     def lo_synth_RF_off(self):
         self.msip = MSIPWrapper(debug=True, lo_power_voltage=0.75)
         return self.msip.lo_synth_off()    
+
+    def get_temperature(self, channel):
+        self.msip = MSIPWrapper(debug=True, lo_power_voltage=0.75)
+        return self.msip.get_temperature(int(channel))
 
     def conn_close(self):
         if self.conn:
