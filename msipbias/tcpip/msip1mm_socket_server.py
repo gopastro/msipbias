@@ -121,9 +121,9 @@ class MSIP1mmSocketServer():
             elif msg[0] == 'get_temperature':
                 if msg[1] in ('1', '2', '3', '4', '5', '6'):
                     temperature = self.get_temperature(msg[1])
-                    self.send("%s Channel %s %s K" % (msg[0], msg[1], temperature))
+                    self.send("%s Channel %s %s K\n" % (msg[0], msg[1], temperature))
                 else:
-                    self.send("%s no_such_channel %s\n" % msg[1])
+                    self.send("%s no_such_channel %s\n" % (msg[0], msg[1]))
             # elif msg[0] == 'close':
             #     self.spec_close()
             # elif msg[0] == 'snapshot':
