@@ -32,7 +32,7 @@ class MSIP1mmSocketServer():
                 self.sock.bind((socket.gethostname(), PORT))
             self.conn = None
             self.addr = None
-            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            #self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.msip = MSIPWrapper(debug=True)
         except:
             self.printlog(str(self.formatExceptionInfo()))
