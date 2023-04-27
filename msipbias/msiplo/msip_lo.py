@@ -249,6 +249,7 @@ class MSIPLOSystem():
         self.offset = 0.0125 # GHz
         self.debug = debug
         self.maxLoopIterations = maxLoopIterations
+        self.synth_RF_on = synth_RF_on
         # Open Synthesizer
         self.synth = Synthesizer(host=prologix_host,
                                  port=prologix_port,
