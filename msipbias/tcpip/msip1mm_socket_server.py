@@ -119,6 +119,9 @@ class MSIP1mmSocketServer():
                 elif msg[1] == 'off':
                     lo_synth_status = self.lo_synth_RF_off()
                     self.send("%s %s\n" % (msg[0], str(lo_synth_status).lower()))
+                elif msg[1] == 'status':
+                    lo_synth_status = self.lo_synth_RF_status()
+                    self.send("%s %s\n" % (msg[0], str(lo_synth_status).lower()))                    
             elif msg[0] == 'get_temperature':
                 if msg[1] in ('1', '2', '3', '4', '5', '6'):
                     temperature = self.get_temperature(msg[1])
@@ -165,7 +168,11 @@ class MSIP1mmSocketServer():
     #     return self.specw.snapsend()        
 
     def pll_status(self):
-        return self.msip.pll_status()
+        try:
+            status = self.msip.pll_status()
+        except:
+            status = 'Exception in PLL Status'
+        return status
         
     def chopper_in(self):
         return self.msip.chopper_in()
@@ -184,15 +191,36 @@ class MSIP1mmSocketServer():
             self.msip = MSIPWrapper(debug=True, lo_power_voltage=0.75)
         else:
             self.msip = MSIPWrapper(debug=True)
-        return self.msip.set_lo_frequency(lo_frequency)
+        try:
+            status = self.msip.set_lo_frequency(lo_frequency)
+        except:
+            status = 'Exception in set_lo_freq'
+        return status
 
     def lo_synth_RF_on(self):
         self.msip = MSIPWrapper(debug=True, lo_power_voltage=0.75)
-        return self.msip.lo_synth_on()
+        try:
+            status = self.msip.lo_synth_on()
+        except:
+            status = 'Exception in lo_synth_RF_on'
+        return status
+            
 
     def lo_synth_RF_off(self):
         self.msip = MSIPWrapper(debug=True, lo_power_voltage=0.75)
-        return self.msip.lo_synth_off()    
+        try:
+            status = self.msip.lo_synth_off()
+        except:
+            status = 'Exception in lo_synth_RF_off'
+        return status
+
+    def lo_synth_RF_status(self):
+        self.msip = MSIPWrapper(debug=True, lo_power_voltage=0.75)
+        try:
+            status = self.msip.lo_synth_status()
+        except:
+            status = 'Exception in lo_synth_RF_status'
+        return status
 
     def get_temperature(self, channel):
         self.msip = MSIPWrapper(debug=True, lo_power_voltage=0.75)

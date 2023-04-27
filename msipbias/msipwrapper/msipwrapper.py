@@ -89,6 +89,16 @@ class MSIPWrapper():
             return status
         except:
             return "ERR"
+
+    def lo_synth_status(self):
+        try:
+            msiplo = MSIPLOSystem(debug=self.debug, check_pll=True, 
+                                  start_power_level_voltage=self.lo_power_voltage)
+            status = msiplo.get_synth_output_status()
+            msiplo.close()
+            return status
+        except:
+            return "ERR"
         
     def get_temperature(self, channel):
         bm = BiasModule(debug=self.debug)
