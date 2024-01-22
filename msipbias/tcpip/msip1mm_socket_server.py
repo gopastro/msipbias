@@ -15,7 +15,8 @@ from msipbias.msipwrapper import MSIPWrapper
 import SocketServer
 logger.name = __name__
 
-allowed_commands = ['lo1_freq', 'pll_status', 'chopper', 'lo_synth', 'get_temperature']
+allowed_commands = ['lo1_freq', 'tune_freq', 'pll_status', 'chopper',
+                    'lo_synth', 'get_temperature']
 
 class MSIP1mmSocketServer():
     debug = 0
@@ -112,6 +113,9 @@ class MSIP1mmSocketServer():
             elif msg[0] == 'lo1_freq':
                 lock_status = self.set_lo_freq(msg[1])
                 self.send("%s %s\n" % (msg[0], str(lock_status).lower()))
+            elif msg[0] == 'tune_freq':
+                tune_status = self.tune_freq(msg[1])
+                self.send("%s %s\n" % (msg[0], str(lock_status).lower()))
             elif msg[0] == 'lo_synth':
                 if msg[1] == 'on':
                     lo_synth_status = self.lo_synth_RF_on()
@@ -185,7 +189,7 @@ class MSIP1mmSocketServer():
 
     def set_lo_freq(self, freqstr):
         lo_frequency = float(freqstr)
-        if (lo_frequency >= 250.0 and lo_frequency < 258.0) or (lo_frequency >= 230.0 and lo_frequency < 235.0):
+        if (lo_frequency >= 250.0 and lo_frequency < 268.0) or (lo_frequency >= 230.0 and lo_frequency < 235.0):
             # Need to lower drain voltage for these frequencies
             print "Setting special frequency"
             self.msip = MSIPWrapper(debug=True, lo_power_voltage=0.75)
@@ -195,7 +199,18 @@ class MSIP1mmSocketServer():
             status = self.msip.set_lo_frequency(lo_frequency)
         except:
             status = 'Exception in set_lo_freq'
-        return status
+        # now tune voltages
+        tune_status = self.tune_freq(lo_frequency)
+        return str(status) + '; ' + str(tune_status)
+
+    def tune_freq(self, freqstr):
+        freq = float(freqstr)
+        self.msip = MSIPWrapper(debug=True)
+        try:
+            status = self.msip.tune_lo_frequency(freq)
+        except:
+            status = 'Exception in tune_freq'
+        return str(status)
 
     def lo_synth_RF_on(self):
         self.msip = MSIPWrapper(debug=True, lo_power_voltage=0.75)

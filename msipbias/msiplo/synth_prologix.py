@@ -74,11 +74,11 @@ class Synthesizer:
             return "OFF"
 
     def output_off(self):
-        "Turn RF output off"""
+        """Turn RF output off"""
         self.write("OUTPUT:STATE OFF")
 
     def output_on(self):
-        "Turn RF output on"""
+        """Turn RF output on"""
         self.write("OUTPUT:STATE ON")
 
     def close(self):

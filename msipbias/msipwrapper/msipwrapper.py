@@ -1,6 +1,7 @@
 from msipbias.chopper import Chopper
 from msipbias.msiplo.msip_lo import MSIPLOSystem
 from msipbias.biasmodule import BiasModule
+from .quick_tune_all import tune_freq
 import time
 
 class MSIPWrapper():
@@ -49,6 +50,10 @@ class MSIPWrapper():
         self.lo_power_voltage = msiplo.power_level_voltage
         msiplo.close()
         return self.lock_status
+
+    def tune_lo_frequency(self, frequency):
+        tune_freq(frequency)
+        return True
 
     def set_lo_power(self, voltage):
         """
