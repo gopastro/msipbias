@@ -3,6 +3,7 @@ import time
 import logging
 import datetime
 import numpy
+import pandas as pd
 
 from msipbias.biasmodule import BiasModule
 from .ifproc_corba import IFProc
