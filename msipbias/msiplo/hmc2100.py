@@ -10,6 +10,23 @@ import re
 from optparse import OptionParser
 import sys
 
+def setup_hmc2100(host='hmc2100', port=50000,
+                  freq=100e6, power=3.5, rf='ON'):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)    
+    s.connect((host, int(port)))
+    #Set power level
+    s.send("POW %f\n" % power)
+    # Set frequency
+    s.send("FREQ:CW %s\n" % freq)
+    if rf is not None:
+        if rf == "ON":
+            s.send("OUTP:STATE 1\n")
+        elif rf == "OFF":
+            s.send("OUTP:STATE 0\n")    
+    retstr = get_status(s)
+    s.close()
+    return retstr
+
 def status_check(host='hmc2100', port=50000):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)    
     s.connect((host, int(port)))
