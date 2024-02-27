@@ -18,7 +18,7 @@ class SISTestSuite(object):
         if not os.path.exists(directory):
             self._print("making directory %s" % directory)
             os.makedirs(directory)
-        self.bm = BiasModule(debig=debug)
+        self.bm = BiasModule(debug=debug)
         plt.ion() # this command allows to show the plot inside a loop
 
     def _print(self, msg, loglevel=logging.INFO, ):
