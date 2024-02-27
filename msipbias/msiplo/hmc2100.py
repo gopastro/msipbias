@@ -28,7 +28,7 @@ def get_status(sock):
         rf = "ON"
     else:
         rf = "OFF"
-    return "Status of HMC 2100 (on %s):\nCW: %s Hz; Pow: %s dBm; RF Status: %s" % (hostname, freq, power, rf)
+    return "Status of HMC 2100 (on %s):\nCW: %s Hz; Pow: %s dBm; RF Status: %s" % ('hmc2100', freq, power, rf)
 
 if __name__ == '__main__':
     usage = "usage: %prog [options]"
