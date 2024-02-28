@@ -317,7 +317,8 @@ class MSIPLOSystem():
             return False
 
         
-    def set_and_lock_frequency(self, flo, synth_power=None):
+    def set_and_lock_frequency(self, flo, synth_power=None,
+                               offset=None):
         """
         Set frequency flo in GHz for 3mm LO system 
         Sets corresponding YIG frequency and adjusts it 
@@ -337,7 +338,9 @@ class MSIPLOSystem():
         if self.debug:
             logger.info("New synth Freq: %.6f GHz" % (self.flo))
             logger.info("New synth Power: %s dBm" % self.synth_power)
-        self.yig_freq = (self.flo/4.) - self.offset # there may be a small offset to subtract
+        if offset is None:
+            offset = self.offset
+        self.yig_freq = (self.flo/4.) - offset # there may be a small offset to subtract
         self.ml.set_frequency(self.yig_freq)
         time.sleep(0.5)  # give YIG time to settle
         locked = False
