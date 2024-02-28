@@ -363,12 +363,12 @@ class MSIPLOSystem():
                     time.sleep(0.5)
             else:
                 print "Something wrong."
-                if self.loopVoltage > 0.0:
-                    self.yig_freq -= 0.01 # reduce by 10 MHz
-                else:
-                    self.yig_freq += 0.01 # increase by 10 MHz
-                self.ml.set_frequency(self.yig_freq)
-                time.sleep(0.5)
+                # if self.loopVoltage > 0.0:
+                #     self.yig_freq -= 0.01 # reduce by 10 MHz
+                # else:
+                #     self.yig_freq += 0.01 # increase by 10 MHz
+                # self.ml.set_frequency(self.yig_freq)
+                # time.sleep(0.5)
                 #if self.flo > 74 and self.flo < 93:
                 if self.flo > 95: # for now disable this 
                     # initially try lowering synth power
