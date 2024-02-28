@@ -245,7 +245,7 @@ class MSIPLOSystem():
                  numIterations=100,
                  maxLoopIterations=10,
                  check_pll=False,
-                 synth_RF_on=False):
+                 synth_RF_on=True):
         self.offset = 0.0125 # GHz
         self.debug = debug
         self.maxLoopIterations = maxLoopIterations
@@ -256,7 +256,8 @@ class MSIPLOSystem():
                                  synth_address=synth_address)
         self.synth.set_mult(6)
         if self.synth_RF_on: # you want to turn it on forcefully
-            self.synth.output_on()  # in case RF was OFF
+            if self.synth.output_status() == 'OFF':
+                self.synth.output_on()  # in case RF was OFF
         self.default_synth_power = default_synth_power
         self.max_synth_power = max_synth_power
         self.min_synth_power = min_synth_power
