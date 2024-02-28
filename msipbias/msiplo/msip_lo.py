@@ -349,7 +349,8 @@ class MSIPLOSystem():
             self.IFLevel, self.loopVoltage = self.getVoltages()
             if self.debug:
                 logger.info("Loop iteration: %d, YIG Freq: %s GHz; IFLevel: %.6f, LoopVoltage: %.6f" % (numLoop, self.yig_freq, self.IFLevel, self.loopVoltage))
-            if self.IFLevel < -0.1:
+            #if self.IFLevel < -0.1:
+            if self.IFLevel < -0.09:
                 # level is pretty good
                 if numpy.abs(self.loopVoltage) < 0.1:
                     # already very low loopVoltage
