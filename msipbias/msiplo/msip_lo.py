@@ -390,7 +390,7 @@ class MSIPLOSystem():
                     #if self.debug:
                     #    print "Boosting Synth power to 15 dBm"
                 else:
-                    break
+                    continue
             numLoop += 1
             if numLoop > self.maxLoopIterations:
                 if self.debug:
