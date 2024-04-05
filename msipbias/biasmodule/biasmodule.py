@@ -5,6 +5,7 @@ from scipy import interpolate
 import numpy
 import pkg_resources
 import cStringIO
+import traceback
 from msipbias.utils import MSIPGeneralError
 
 def binspace(number):
@@ -476,6 +477,8 @@ class BiasModule(object):
             sys.stdout.flush()
             return True
         except:
+            exc = traceback.format_exc()
+            print(exc)
             raise MSIPGeneralError("CheetahUSB", "Error opening Cheetah USB device")
         
     def configure_cheetah(self):
