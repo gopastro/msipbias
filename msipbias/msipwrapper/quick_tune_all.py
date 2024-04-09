@@ -56,7 +56,8 @@ magnet_currents = {
     }
 
 power_level_voltages = {
-    222: 1.8,
+    221: 1.5,
+    222: 1.5,
     226: 1.8,
     230: 1.8,
     234: 1.8,
