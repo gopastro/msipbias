@@ -3,6 +3,7 @@ from msipbias.biasmodule import BiasModule
 #from msipbias.msipwrapper import MSIPWrapper
 from msipbias.msiplo.msip_lo import MSIPLOSystem
 
+
 sis_voltages = {
     222: {0: {1: -8.2, 2: 8.1},
           1: {1: -8.3, 2: 8.2}
@@ -63,8 +64,10 @@ power_level_voltages = {
     234: 1.8,
     238: 1.6,
     242: 1.0,
-    246: 0.5,
-    250: 1.0,
+    # 246: 0.5,
+    246: 0.45,
+    # 250: 1.0,
+    250: 0.4,
     254: 1.0,
     258: 1.0,
     262: 1.0,
